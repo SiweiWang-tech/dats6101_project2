@@ -1,0 +1,304 @@
+---
+title: "Data Science Project -  A Review of the Relationship Between Song Features and Its Relative Popularity With Respect to Time"
+author: "Memes and Music: \nRich Gude \nSiwei Yang \nJunhe Zhang \nKrystal Payton"
+date: "April 22, 2020"
+output:
+  html_document:
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    number_sections: true
+  pdf_document:
+    toc: yes
+---
+
+<style type="text/css">
+.main-container {
+  
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+```{r setup, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+knitr::opts_chunk$set(warning = F, results = T, message = F)
+# knitr::opts_chunk$set(warning = F, results = F, message = F)
+# knitr::opts_chunk$set(include = F)
+# knitr::opts_chunk$set(echo = TRUE)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# 'scipen': integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than 'scipen' digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+```{r basicfcn, include=F}
+# use this function to conveniently load libraries and work smoothly with knitting
+# can add quietly=T option to the require() function
+# note that using this function requires quotes around the package name, as you would when installing packages.
+loadPkg = function(x) { if (!require(x,character.only=T, quietly =T)) { install.packages(x,dep=T,repos="http://cran.us.r-project.org"); if(!require(x,character.only=T)) stop("Package not found") } }
+# unload/detact package when done using it
+# detach_package = function(pkg, character.only = FALSE) { if(!character.only) { pkg <- deparse(substitute(pkg)) } search_item <- paste("package", pkg, sep = ":") while(search_item %in% search()) { detach(search_item, unload = TRUE, character.only = TRUE) } }
+```
+
+```{r outlierKD2, include = F}
+# Fix outliers
+outlierKD2 <- function(df, var, rm=FALSE) { 
+    #' Original outlierKD functino by By Klodian Dhana,
+    #' https://www.r-bloggers.com/identify-describe-plot-and-remove-the-outliers-from-the-dataset/
+    #' Modified to have third argument for removing outliers instead of interactive prompt, 
+    #' and after removing outlier, original df will not be changed. The function returns the new df, 
+    #' which can be saved as original df name if desired.
+    #' Check outliers, and option to remove them, save as a new dataframe. 
+    #' @param df The dataframe.
+    #' @param var The variable in the dataframe to be checked for outliers
+    #' @param rm Boolean. Whether to remove outliers or not.
+    #' @return The dataframe with outliers replaced by NA if rm==TRUE, or df if nothing changed
+    #' @examples
+    #' outlierKD2(mydf, height, FALSE)
+    #' mydf = outlierKD2(mydf, height, TRUE)
+    #' mydfnew = outlierKD2(mydf, height, TRUE)
+    dt = df # duplicate the dataframe for potential alteration
+    var_name <- eval(substitute(var),eval(dt))
+    na1 <- sum(is.na(var_name))
+    m1 <- mean(var_name, na.rm = T)
+    par(mfrow=c(2, 2), oma=c(0,0,3,0))
+    boxplot(var_name, main="With outliers")
+    hist(var_name, main="With outliers", xlab=NA, ylab=NA)
+    outlier <- boxplot.stats(var_name)$out
+    mo <- mean(outlier)
+    var_name <- ifelse(var_name %in% outlier, NA, var_name)
+    boxplot(var_name, main="Without outliers")
+    hist(var_name, main="Without outliers", xlab=NA, ylab=NA)
+    title("Outlier Check", outer=TRUE)
+    na2 <- sum(is.na(var_name))
+    cat("Outliers identified:", na2 - na1, "\n")
+    cat("Propotion (%) of outliers:", round((na2 - na1) / sum(!is.na(var_name))*100, 1), "\n")
+    cat("Mean of the outliers:", round(mo, 2), "\n")
+    m2 <- mean(var_name, na.rm = T)
+    cat("Mean without removing outliers:", round(m1, 2), "\n")
+    cat("Mean if we remove outliers:", round(m2, 2), "\n")
+    
+    # response <- readline(prompt="Do you want to remove outliers and to replace with NA? [yes/no]: ")
+    # if(response == "y" | response == "yes"){
+    if(rm){
+        dt[as.character(substitute(var))] <- invisible(var_name)
+        #assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+        cat("Outliers successfully removed", "\n")
+        return(invisible(dt))
+    } else {
+        cat("Nothing changed", "\n")
+        return(invisible(df))
+    }
+}
+
+```
+
+# Executive Summary:
+
+
+
+# Purpose:
+
+The purpose of this study is to analyse the affect of music attributes, such as tempo, key, mode, etc, on the popularity of songs with respect to time.  Specifically, the SMART question for this study is: Does the key, valence, tempo, or other musical attributes change between popular songs, and not popular songs for contrast, in the 1960's versus songs from the early 2000's?
+
+The methodology by which this will be accomplished is to analyze song attribute data collected from Spotify using their application programming interface (API).  This attribute data collects the following features for every song, or "track", under review: track, artist, key, mode, valence, tempo, "energy", "liveness", and "danceability".  The popularility of each song will be a binary attribute: A song will be considered popular if it appears in the Billboard Hot 100, a weekly top list of the popular tracks from each week measured by Billboard Magazine.  Billboard Magazine is the widely considered standard for song popularity and has existed since the 1960s through today and, so, represents a consistent standard for measuring song popularity through time.
+
+# A Discussion of Basic Music Theory
+
+Music, as an art, has a long and varied history depending on the era and geographical space in which an individual may be concerned.  While the purpose of this study is to identify the change of popular music, at least over a short period since what is 50 years to the entire timeline of the human species over which music in some form is sure to have been evident, the entire history of what music is composed and how it is written or expressed will not be discussed herein.  Instead, this study is focused on contemporary, American-produced songs, and so, certain objective measurements of song qualities, namely tempo, key, and mode, can be used to compare and contrast songs both across the musically spectrum, from say jazz to rock-and-roll, and through time.
+
+Tempo, key, and mode are relatively basic concepts in music theory.  The beat is the basic unit of time in music, the pace at which the music pulses; it is, essentially, when a listener would tap their toe during a song.  **Tempo** is the speed or pace of a given song and is often measured beats per minute.  Certain genres of songs are defined by high tempos, like electric-dance music (EDM), but most genres vary considerably in their tempo.  Pitch is the audio frequency at which individual notes within the song are heard by the listener.  In general terms, the **key** of a song is average pitch of a song, or the pitch around which a song fluctuates; performing a song in a higher key means that all of the notes of a song are increased at a level commiserate with the change in key (a major key change from "C'" to "D", one pitch, would change the pitch of all notes in the song up pitch as well).  Along the same concept as key, **mode** is the interval at which pitches are expressed in a song and is expressed as either "minor" or "major".  The key and mode are often expressed together when describing the pitch qualities of a song, such as "F major" or "D minor".  From an audio perspective, "major" keys are more often associated with and evoke happy or bright melodies, whereas "minor" keys may sound melancholic.
+
+The concepts discussed here are general introduction to the features that will be discussed as part of this study's dataset, and the format herein does not support audio examples, which would be necessary for any comprehensive understanding of music theory.  Additional discussion of tempo, key, and mode, with audio examples for the differences between keys and modes, can be found [here](https://www.youtube.com/watch?v=rgaTLrZGlk0).
+
+# Data Selection:
+
+As identified in the methodology statement, the data in this study is pulled from two corporate sources, Spotify Technology S.A. (Spotify) and the Billboard-Hollywood Media Group.  Spotify is a popular online streaming service for music, videos, and podcasts.  Spotify provides an "Audio Analysis" of a musical tracks that describes the structure of the tracks and its musical content, including tempo, key, and mode, discussed above, in addition to more sophisticated musical metrics relating multiple core concepts of music.  The advance metrics that will be tracked from Spotify Audio Analysis in this study are valence, "danceability", "energy", and "liveness"; these metrics are discussed further below.  The Billboard-Hollywood Media Group owns and produces the "Billboard" magazine.  This publication is famous for the Billboard Hot 100 list, a weekly-published list that identifies the most popular, American songs of the week, based on sales and digital downloads and streams.  The Billboard Hot 100 have been in publication since 1958 and establishes an objective standard for identifies popular songs for the purposes of this study.
+
+Based on the source from which popular songs are determined, the conclusions of this study should only apply to songs produced or with a large-commerical release in the United States of America.  Song features for popular songs based on similar metrics of sales and digital views from other countries may vary from the results reported herein.
+
+The data analyized herein was pulled from the Kaggle database website.  The specific dataset can be found [here](https://www.kaggle.com/theoverman/the-spotify-hit-predictor-dataset).
+
+# Data Background:
+
+As stated previously, the Spotify Audio Analysis records multiple features for each track in its extensive collection of music titles.  Some of these features, such as tempo, key, and mode, have strict definitions within the music community and are, otherwise, clear, quantifiable variables (e.g., tempo is measured in beats per minute).  Other features do not have strict definitions within the music community and/or do not have a clear, quantifiable standard that can be measured within each track.  The following features are ranked in Spotify's analyses on a scale of 0 to 1 and will be considered for analysis in this study: [^1]
+- **Valence** describes the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).  For perspective: from the 2000's data set, one popular song with a high valence (0.965) is OutKast's [Hey Ya](https://open.spotify.com/track/2PpruBYCo4H7WOBJ7Q2EwM?si=3b7dll0ITZ-H5FsIu-qGig), while a song with low valence (0.0356) is deadmau5's [Strobe](https://open.spotify.com/track/31NiyZrUd1r4icY7xkvnWv?si=przVh9EjRgG-oyH5rInY9A).
+- **Danceability** describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. For perspective: from the 2000's data set, one popular song with a high danceability (0.956) is Nelly's [Hot in Herre](https://open.spotify.com/track/04KTF78FFg8sOHC1BADqbY?si=i8f_wIreTsu34rIpSX4PDA), while a song with low danceability (0.0356) is Venom's [Black Metal](https://open.spotify.com/track/3yNoEJifUJdly8ucYoWRwl?si=15rDImzOTkSfJlpggbrPLw). 
+- **Energy** represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy. For perspective: from the 2000's data set, one popular song with a high energy (0.991) is Fatboy Slim's [The Rockafeller Skank](https://open.spotify.com/track/7mCQK9YB25WZw1saUjfL4e?si=46Rwt-TMQgusLo_Wjm3o0g), while a song with low energy (0.0013) is Alvin Curran's [Inner Cities II](https://open.spotify.com/track/4De0j0rVNmezk0EXPzOtwZ?si=ShNPfVWrQfKzZPiBlxKS-g).
+- **Liveness** detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. For perspective: from the 2000's data set, one popular song with a high liveness (0.959) is Metallica's [No Leaf CLover - Live](https://open.spotify.com/track/0n4AllHzf3ma4ki20Y9h00?si=d3-JKQO9SOeTVxMzNhOYYQ), while any studio-produced song would have a low liveness.
+
+The full analysis of these features, namely the methods or calculations by which their values are determined, are not released by Spotify, potentially due to intellectual property reasons.
+
+The Billboard Hot 100 has several component charts that contribute to the overall calculation of the Hot 100 each week. The most significant components are: [^2]
+- **Hot 100 Airplay**: (per Billboard) approximately 1,000 stations, "composed of adult contemporary, R&B, hip hop, country, rock, gospel, Latin and Christian formats, digitally monitored twenty-four hours a day, seven days a week. Charts are ranked by number of gross audience impressions, computed by cross-referencing exact times of radio airplay with Arbitron listener data." 
+- **Hot Singles Sales**: (per Billboard) "the top selling singles compiled from a national sample of retail store, mass merchant and internet sales reports collected, compiled, and provided by Nielsen SoundScan." The chart is released weekly and measures sales of physical commercial singles. With the decline in sales of physical singles in the US, many songs that become number one on this chart often do not even chart on the Hot 100.
+- **Digital Songs**: Digital sales are tracked by Nielsen SoundScan and are included as part of a title's sales points.
+- **Streaming Songs**: a collaboration between Billboard, Nielsen SoundScan and National Association of Recording Merchandisers which measures the top streamed radio songs, on-demand songs and videos on leading online music services.
+
+From these varied and independent sources, the Billboard Hot 100 represents a nuetral and storied arbiter of the objective popularity of songs from 1958 thorugh the present, including all songs to be evaluated from the 1960s and early 2000s.
+
+# Data Preprocessing
+
+The Spotify Audio Analysis stores up to 42 music features for each track.  For the purposes of this study, only the following variables will be analyzed and reviewed:
+
+``` {r DataImport, include = T, results = F}
+loadPkg('tidyverse')
+
+# Import 1960's and 2000's data as separate dataframes
+data1960 <- subset(data.frame(read_csv('dataset-of-60s.csv')), select = c('track', 'artist', 'tempo', 'key', 'mode', 'valence', 'danceability', 'energy', 'liveness', 'target'))
+data2000 <- subset(data.frame(read_csv('dataset-of-00s.csv')), select = c('track', 'artist', 'tempo', 'key', 'mode', 'valence', 'danceability', 'energy', 'liveness', 'target'))
+# Provide a summary of the columns and data within the data
+summary(data2000)
+length((which(data2000$target == 1)))
+nrow(subset(data2000,target == 0))
+length(data1960$target[data1960$target == 1])
+length(data1960$target[data1960$target == 0])
+```
+
+**Track Variables of Interest:**
+
+1. Track: the name of the track
+2. Artist: the name of the artist
+3. Tempo: a float value for the beats per minute of the song 
+4. Key: an integer mapping of the standard pitch-class notation where: 0 = C key, 1 = C*#*/D*b*, 2 = D, and so on in rising key fashion up to 11 = B key.
+5. Mode: an integer mapping for major (1) and minor (0) keys
+6. Valence: a float value between 0 and 1 for the relative valence of the track (discussed in the Data Background)
+7. Danceabilty: a float value between 0 and 1 for the relative danceability of the track (discussed in the Data Background)
+8. Energy: a float value between 0 and 1 for the relative energy of the track (discussed in the Data Background)
+9. Liveness: a float value between 0 and 1 for the relative liveness of the track (discussed in the Data Background)
+
+In preprocessing the data, all of the variables from the Spotify data not listed above were eliminated from the study dataset.
+
+The final feature, **Target**, was computed from the collective data from Billboard's Hot 100 list.  Any track listed in the Billboard Hot 100 during the respective decade from which a track was released is given a value of 1, and any track not list at any point in the Billboard Hot 100 is given a 0.
+
+This study will examine the change in music metrics affecting popularity with respect to time.  For this purpose, this study will analyze two datasets, one with songs released during the 1960s, containing `r nrow(data1960)` songs, and the other with songs released from the 2000s, containing `r nrow(data2000)` songs.  Each dataset is composed of an equal number of popular and not popular songs, `r nrow(subset(data2000,target == 1))` popular and not popular songs from the 2000s and `r nrow(subset(data1960,target == 1))` popular and not popular songs from the 1960s.  For every song that appears in the Billboard Hot 100 list from their respective decade (with a target value of 1), another song from the same decade, not appearing in the Hot 100 was chosen to fill in the dataset for analytics and review.
+
+A summary of the variables and their values from the entire 2000's and 1960's datasets are presented below:
+
+``` {r DataSummary}
+# Provide a summary of the columns and data within the data
+print('A Summary of the 2000\'s Dataset:')
+summary(data2000)
+
+print('A Summary of the 1960\'s Dataset:')
+summary(data1960)
+```
+
+# Variable Anaylsis and Approach
+
+The purpose of this study is to identify any link or lackthereof between the popularity of a song and seven other factors, tempo, key, mode, valence, danceability, energy, and liveness, based on track metric data computed from Spotify.  A cursory review of the song feature values for just popular between the two decades shows a difference in the mean values for multiple song features.  From the 1960's to the early 2000's, the mean valence noticeably decreases while the mean danceability and energy values noticeably increase.
+
+``` {r DataSummary}
+# Provide a summary of the columns and data within the data
+print('A Summary of the Popular 2000\'s Tracks:')
+summary(subset(data2000, target == 1))
+
+print('A Summary of the Popular 1960\'s Tracks:')
+summary(subset(data1960, target == 1))
+```
+
+
+# K-Nearest Neighbor - Juhne
+(For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
+
+Suggestion: For KNN, use 'target' variable as the dependent variable.  Potentially try different combinations of the features above to improve the accuracy (a feature-selection-like anaylsis).
+
+# Logit Regression - Siwei
+(For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
+
+(Linear Regression but with non-linear modeling - our target is binary so this is good)
+
+# Feature Selection/Model selection - Krystal
+
+For the section, we will look at the Feature Selection in Linear Models.  We will continue using the dataset for the 1960s and 2000s songs.  We will first eliminate any variables that we believe are useless for this section.  We only have to remove the variable labeled as target and mode.
+
+```{r removal, include=T}
+# cleaned dataset
+data1960s <- data.frame(read.csv("dataset-of-60s.csv"))
+data2000s <- data.frame(read.csv("dataset-of-00s.csv"))
+
+data1960_1 = data1960s[,c('track', 'artist', 'danceability', 'energy', 'key', 'liveness', 'valence', 'tempo')] 
+data2000_1 = data2000s[,c('track', 'artist', 'danceability', 'energy', 'key', 'liveness', 'valence', 'tempo')]
+data1960_1
+data2000_1
+
+data1960_1$danceability <- as.integer(data1960_1$danceability)
+data1960_1$energy <- as.integer(data1960_1$energy)
+data1960_1$key <- as.integer(data1960_1$key)
+data1960_1$liveness <- as.integer(data1960_1$liveness)
+data1960_1$valence <- as.integer(data1960_1$valence)
+data1960_1$tempo <- as.integer(data1960_1$tempo)
+data1960_1
+
+data2000_1$danceability <- as.integer(data2000_1$danceability)
+data2000_1$energy <- as.integer(data2000_1$energy)
+data2000_1$key <- as.integer(data2000_1$key)
+data2000_1$liveness <- as.integer(data2000_1$liveness)
+data2000_1$valence <- as.integer(data2000_1$valence)
+data2000_1$tempo <- as.integer(data2000_1$tempo)
+data2000_1
+
+
+```
+
+###Exhaustive search
+We are now going to use the exhaustive search to get the best results to find out which variables will create the best model to show which factors affects whether a song is popular or not in both 1960s and 2000s.
+
+```{r exhaustive search, results=T}
+#This is essentially best fit 
+#install.packages('leaps')
+#install.packages('cars')
+loadPkg('leaps')
+#loadPkg(cars)
+#reg.best8 <- regsubsets(key~. , data = data2000_1, nbest = 2, method = "exhaustive")
+#plot(reg.best8, scale = "adjr2", main = "Adjusted R^2")
+#plot(reg.best8, scale = "r2", main = "R^2")
+#plot(reg.best8, scale = "bic", main = "BIC")
+#plot(reg.best8, scale = "Cp", main = "Cp")
+#summary(reg.best8)
+
+
+reg.2000 <- regsubsets(key~. , data = data1960_1, nbest = 2, method = "exhaustive")
+plot(reg.2000, scale = "adjr2", main = "Adjusted R^2")
+plot(reg.2000, scale = "r2", main = "R^2")
+plot(reg.2000, scale = "bic", main = "BIC")
+plot(reg.2000, scale = "Cp", main = "Cp")
+summary(reg.2000)
+```
+
+
+```{r}
+
+```
+
+(For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
+
+Suggestion: Include an analysis and discussion of why certain variables are best (find and discuss computing time for instance)
+
+# Summary of Results
+
+
+
+---
+[^1] Taken from [Spotify for Developers Web Services Page](https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/)
+[^2] From Molanphy, Chris (August 1, 2013). "How The Hot 100 Became America's Hit Barometer". Published by NPR.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
