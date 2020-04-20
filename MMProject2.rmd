@@ -508,6 +508,102 @@ ggplot(knn_different_k,
 # Logit Regression - Siwei
 (For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
 
+```{r LogReg-Siwei}
+data1960$track <- factor(data1960$track)
+data1960$artist <- factor(data1960$artist)
+data1960$key <- factor(data1960$key)
+data1960$mode <- factor(data1960$mode)
+data1960$target <- factor(data1960$target)
+```
+
+```{r LogReg-Siwei}
+data1960Logit_1 <- glm(target ~ tempo, data = data1960, family = "binomial")
+data1960Logit_1
+```
+
+We can see the summary of the logit model here:  
+```{r logitSummary-Siwei}
+summary(data1960Logit_1)
+```
+
+```{r LogReg-Siwei}
+data1960Logit_2 <- glm(target ~ tempo+valence, data = data1960, family = "binomial")
+data1960Logit_2
+
+summary(data1960Logit_2)
+```
+
+```{r LogReg-Siwei}
+data1960Logit_3 <- glm(target ~ tempo+valence+danceability, data = data1960, family = "binomial")
+data1960Logit_3
+
+summary(data1960Logit_3)
+```
+
+```{r LogReg-Siwei}
+data1960Logit_4 <- glm(target ~ tempo+valence+danceability+energy, data = data1960, family = "binomial")
+data1960Logit_4
+
+summary(data1960Logit_4)
+```
+
+```{r LogReg-Siwei}
+data1960Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data = data1960, family = "binomial")
+data1960Logit_5
+
+summary(data1960Logit_5)
+```
+
+We can also easily obtain the growth/decay factors for each explanatory variables. Notice that these factors apply to the odds-ratio, not the odds of being accepted. Nonetheless, these growth and decay factors are very useful in our analysis. The factors are the exponentials of the coefficients:   
+
+```{r growthDecayFactors, LogReg-Siwei}
+expcoeff = exp(coef(data1960Logit_5))
+expcoeff
+```
+
+```{r LogReg-Siwei}
+data2000$track <- factor(data2000$track)
+data2000$artist <- factor(data2000$artist)
+data2000$key <- factor(data2000$key)
+data2000$mode <- factor(data2000$mode)
+data2000$target <- factor(data2000$target)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_1 <- glm(target ~ tempo, data = data2000, family = "binomial")
+summary(data2000Logit_1)
+```
+
+```{r LogReg-Siwei}
+data2000Logit_2 <- glm(target ~ tempo+valence, data = data2000, family = "binomial")
+summary(data2000Logit_2)
+```
+
+```{r LogReg-Siwei}
+data2000Logit_3 <- glm(target ~ tempo+valence+danceability, data = data2000, family = "binomial")
+summary(data2000Logit_3)
+```
+
+```{r LogReg-Siwei}
+data2000Logit_4 <- glm(target ~ tempo+valence+danceability+energy, data = data2000, family = "binomial")
+
+summary(data2000Logit_4)
+```
+
+```{r LogReg-Siwei}
+data2000Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data = data2000, family = "binomial")
+
+summary(data2000Logit_5)
+```
+
+We can also easily obtain the growth/decay factors for each explanatory variables. Notice that these factors apply to the odds-ratio, not the odds of being accepted. Nonetheless, these growth and decay factors are very useful in our analysis. The factors are the exponentials of the coefficients:   
+
+```{r growthDecayFactors, LogReg-Siwei}
+expcoeff = exp(coef(data2000Logit_5))
+expcoeff
+```
+
 (Linear Regression but with non-linear modeling - our target is binary so this is good)
 
 # Feature Selection/Model selection - Krystal
