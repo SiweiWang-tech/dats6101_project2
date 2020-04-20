@@ -191,14 +191,22 @@ summary(data1960)
 
 The purpose of this study is to identify any link or lackthereof between the popularity of a song and seven other factors, tempo, key, mode, valence, danceability, energy, and liveness, based on track metric data computed from Spotify.  A cursory review of the song feature values for just popular between the two decades shows a difference in the mean values for multiple song features.  From the 1960's to the early 2000's, the mean valence noticeably decreases while the mean danceability and energy values noticeably increase.
 
-``` {r DataSummary}
+``` {r DataSummary2}
 # Provide a summary of the columns and data within the data
 print('A Summary of the Popular 2000\'s Tracks:')
 summary(subset(data2000, target == 1))
 
+print('A Summary of the NonPopular 2000\'s Tracks:')
+summary(subset(data2000, target == 0))
+
 print('A Summary of the Popular 1960\'s Tracks:')
 summary(subset(data1960, target == 1))
+
+print('A Summary of the NonPopular 1960\'s Tracks:')
+summary(subset(data1960, target == 0))
 ```
+
+
 
 
 # K-Nearest Neighbor - Juhne
@@ -213,70 +221,381 @@ Suggestion: For KNN, use 'target' variable as the dependent variable.  Potential
 
 # Feature Selection/Model selection - Krystal
 
-For the section, we will look at the Feature Selection in Linear Models.  We will continue using the dataset for the 1960s and 2000s songs.  We will first eliminate any variables that we believe are useless for this section.  We only have to remove the variable labeled as target and mode.
-
-```{r removal, include=T}
-# cleaned dataset
-data1960s <- data.frame(read.csv("dataset-of-60s.csv"))
-data2000s <- data.frame(read.csv("dataset-of-00s.csv"))
-
-data1960_1 = data1960s[,c('track', 'artist', 'danceability', 'energy', 'key', 'liveness', 'valence', 'tempo')] 
-data2000_1 = data2000s[,c('track', 'artist', 'danceability', 'energy', 'key', 'liveness', 'valence', 'tempo')]
-data1960_1
-data2000_1
-
-data1960_1$danceability <- as.integer(data1960_1$danceability)
-data1960_1$energy <- as.integer(data1960_1$energy)
-data1960_1$key <- as.integer(data1960_1$key)
-data1960_1$liveness <- as.integer(data1960_1$liveness)
-data1960_1$valence <- as.integer(data1960_1$valence)
-data1960_1$tempo <- as.integer(data1960_1$tempo)
-data1960_1
-
-data2000_1$danceability <- as.integer(data2000_1$danceability)
-data2000_1$energy <- as.integer(data2000_1$energy)
-data2000_1$key <- as.integer(data2000_1$key)
-data2000_1$liveness <- as.integer(data2000_1$liveness)
-data2000_1$valence <- as.integer(data2000_1$valence)
-data2000_1$tempo <- as.integer(data2000_1$tempo)
-data2000_1
+For the section, we will look at the Feature Selection in Linear Models.  We will continue using the dataset for the 1960s and 2000s music songs.  We will first eliminate any variables that we believe are useless for this section.  We are removing the variables labeled track, artist, target, and mode.  We also are removing any data that has NA as a number.  Please see the following:
 
 
-```
-
-###Exhaustive search
-We are now going to use the exhaustive search to get the best results to find out which variables will create the best model to show which factors affects whether a song is popular or not in both 1960s and 2000s.
-
-```{r exhaustive search, results=T}
-#This is essentially best fit 
-#install.packages('leaps')
-#install.packages('cars')
-loadPkg('leaps')
-#loadPkg(cars)
-#reg.best8 <- regsubsets(key~. , data = data2000_1, nbest = 2, method = "exhaustive")
-#plot(reg.best8, scale = "adjr2", main = "Adjusted R^2")
-#plot(reg.best8, scale = "r2", main = "R^2")
-#plot(reg.best8, scale = "bic", main = "BIC")
-#plot(reg.best8, scale = "Cp", main = "Cp")
-#summary(reg.best8)
 
 
-reg.2000 <- regsubsets(key~. , data = data1960_1, nbest = 2, method = "exhaustive")
-plot(reg.2000, scale = "adjr2", main = "Adjusted R^2")
-plot(reg.2000, scale = "r2", main = "R^2")
-plot(reg.2000, scale = "bic", main = "BIC")
-plot(reg.2000, scale = "Cp", main = "Cp")
-summary(reg.2000)
-```
 
 
-```{r}
 
-```
+
 
 (For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
 
 Suggestion: Include an analysis and discussion of why certain variables are best (find and discuss computing time for instance)
+
+
+
+```{r setup2, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# knitr::opts_chunk$set(warning = F, results = 'markup', message = F)
+knitr::opts_chunk$set(warning = F, results = 'hide', message = F)
+# knitr::opts_chunk$set(include = F)
+# knitr::opts_chunk$set(echo = TRUE)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+```{r basic, include=F}
+# use this function to conveniently load libraries and work smoothly with knitting
+# can add quietly=T option to the require() function
+loadPkg = function(pkg, character.only = FALSE) { 
+  if (!character.only) { pkg <- as.character(substitute(pkg)) }
+  pkg <- ifelse(!character.only, as.character(substitute(pkg)) , pkg)  
+  if (!require(pkg,character.only=T, quietly =T)) {  install.packages(substitute(pkg),dep=T); if(!require(pkg,character.only=T)) stop("Package not found") } 
+}
+loadPkg(knitr)
+
+# unload/detact package when done using it
+unloadPkg = function(pkg, character.only = FALSE) { 
+  if(!character.only) { pkg <- as.character(substitute(pkg)) } 
+  search_item <- paste("package", pkg,sep = ":") 
+  while(search_item %in% search()) { detach(search_item, unload = TRUE, character.only = TRUE) } 
+}
+```
+
+```{r uzscale_fcn}
+uzscale <- function(df, append=0, excl=NULL) { 
+  #' Standardize dataframe to z scores, safe for non-numeric variables. 
+  #' ELo 201904 GWU DATS
+  #' @param df The dataframe.
+  #' @param append T/F or 0/1. Option to append scaled columns or replace original columns in the dataframe.
+  #' @param excl A list c(a,b,"d","ef") of excluded columns, either by their indexes and/or names.
+  #' @return The transformed dataframe, appended or replaced with standardized scores. Non-numeric columns will not be appended, or if "replace option" is chosen, the columns will be untouched.
+  #' @examples
+  #' library("ISLR")
+  #' tmp = uzscale( Hitters )
+  #' tmp = uzscale( Hitters, 1 )
+  #' tmp = uzscale( Hitters, TRUE, c(19,"NewLeague") )
+  
+  append = ifelse(append==TRUE || append=="true" || append=="True" || append=="T" || append=="t" || append==1 || append=="1", TRUE, FALSE) # standardize append 
+  nmax = length(df)
+  if (nmax < 1 || !is.numeric(nmax) ) { return(df) }
+  df1 = df
+  onames = colnames(df)  # the original column names
+  cnames = onames  # the new column names, if needed start with the original ones
+  znames = paste("z",cnames, sep="")     # new column names added prefix 'z'. Those are non-numeric will not be used.
+  nadd = ifelse(append, nmax, 0) # add to the column index or replace the orig columns
+  j=1  # counting index
+  for( i in 1:nmax ) {
+    if ( is.numeric(df[,i]) && !( i %in% excl || onames[i] %in% excl ) ) { 
+      df1[,j+nadd] = scale(df[,i])
+      cnames = c(cnames, znames[i])
+      j=j+1
+    } else if ( !append ) { j=j+1
+    } # if append == 1 and (colunm non-numeric or excluded), do not advance j.
+  }
+  if (append) { colnames(df1) <- cnames }
+  return(df1)
+}
+```
+
+```{r xkablesummary}
+loadPkg(xtable)
+loadPkg(kableExtra)
+loadPkg(stringi)
+
+xkabledply = function(modelsmmrytable, title="Table", digits = 4, pos="left", bso="striped") { 
+  #' Combining base::summary, xtable, and kableExtra, to easily display model summary. 
+  #' wrapper for the base::summary function on model objects
+  #' ELo 202004 GWU DATS
+  #' version 1.2
+  #' @param modelsmmrytable This can be a generic table, a model object such as lm(), or the summary of a model object summary(lm()) 
+  #' @param title Title of table. 
+  #' @param digits Number of digits to display
+  #' @param pos Position of table, c("left","center","right") 
+  #' @param bso bootstrap_options = c("basic", "striped", "bordered", "hover", "condensed", "responsive")
+  #' @return HTML table for display
+  #' @examples
+  #' library("xtable")
+  #' library("kableExtra")
+  #' xkabledply( df, title="Table testing", pos="left", bso="hover" )
+  modelsmmrytable %>%
+    xtable() %>% 
+    kable(caption = title, digits = digits) %>%
+    kable_styling(bootstrap_options = bso, full_width = FALSE, position = pos)
+}
+
+xkablesummary = function(df, title="Table: Statistics summary.", digits = 4, pos="left", bso="striped") { 
+  #' Combining base::summary, xtable, and kableExtra, to easily display numeric variable summary of dataframes. 
+  #' ELo 202004 GWU DATS
+  #' version 1.2
+  #' @param df The dataframe.
+  #' @param title Title of table. 
+  #' @param digits Number of digits to display
+  #' @param pos Position of table, c("left","center","right") 
+  #' @param bso bootstrap_options = c("basic", "striped", "bordered", "hover", "condensed", "responsive")
+  #' @return The HTML summary table for display, or for knitr to process into other formats 
+  #' @examples
+  #' xkablesummary( faraway::ozone )
+  #' xkablesummary( ISLR::Hitters, title="Five number summary", pos="left", bso="hover"  )
+  
+  s = summary(df) %>%
+    apply( 2, function(x) stringr::str_remove_all(x,c("Min.\\s*:\\s*","1st Qu.\\s*:\\s*","Median\\s*:\\s*","Mean\\s*:\\s*","3rd Qu.\\s*:\\s*","Max.\\s*:\\s*")) ) %>% # replace all leading words
+    apply( 2, function(x) stringr::str_trim(x, "right")) # trim trailing spaces left
+  
+  colnames(s) <- stringr::str_trim(colnames(s))
+  
+  if ( dim(s)[1] ==6 ) { rownames(s) <- c('Min','Q1','Median','Mean','Q3','Max') 
+  } else if ( dim(s)[1] ==7 ) { rownames(s) <- c('Min','Q1','Median','Mean','Q3','Max','NA') }
+  
+  xkabledply(s, title=title, digits = digits, pos=pos, bso=bso )
+}
+
+xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", bso="striped") { 
+  #' Combining faraway::vif, xtable, and kableExtra, to easily display numeric summary of VIFs for a model. 
+  #' ELo 202004 GWU DATS
+  #' version 1.2
+  #' @param model The lm or compatible model object.
+  #' @param title Title of table. 
+  #' @param digits Number of digits to display
+  #' @param pos Position of table, c("left","center","right") 
+  #' @param bso bootstrap_options = c("basic", "striped", "bordered", "hover", "condensed", "responsive")
+  #' @return The HTML summary table of the VIFs for a model for display, or for knitr to process into other formats 
+  #' @examples
+  #' xkablevif( lm(Salary~Hits+RBI, data=ISLR::Hitters) )
+  
+  vifs = table( names(model$coefficients)[2:length(model$coefficients)] ) # remove intercept to set column names
+  vifs[] = faraway::vif(model) # set the values
+  xkabledply( vifs, title=title, digits = digits, pos=pos, bso=bso )
+}
+
+```
+
+
+```{r Classification, include=F}
+loadPkg(rpart) # Classification trees, rpart(formula, data=, method=,control=) 
+```
+
+
+# Decision Trees
+The main goal of this section is to predict whether the target class of popular and non popular songs will have different variables that affect them in the 1960s and 2000s.  Will the songs have the same variables that matter most in both years or will they differ? 
+
+## Grow the Tree
+In this section, the study will be using the Categorical Decision Tree to show what makes a song popular in the 1960s verses the 2000s.  The variables of tempo, key, valence, danceability, energy, liveness, and mode are the independent variables and target will be used as the dependent variable.  First there had to be changings made to the variable target so it could be a factor variable.  Once this has been done, one can proceed to grow the decision tree by starting at the root and building up.  Our root will be target which has already been stated as the dependent variable:
+
+```{r cleandata, include=F}
+data1960$target <- as.factor(data1960$target)
+str(data1960)
+
+data2000$target <- as.factor(data2000$target)
+str(data2000)
+```
+
+```{r KPTree1960, echo = T, fig.dim=c(6,4)}
+set.seed(1)
+data1960_DT <- rpart(target ~ tempo + key + valence + danceability + energy + liveness, data=data1960, method="class", control = list(maxdepth = 10) )
+printcp(data1960_DT) # display the results 
+plotcp(data1960_DT) # visualize cross-validation results 
+summary(data1960_DT) # detailed summary of splits
+
+# plot tree 
+plot(data1960_DT, uniform=TRUE, main="Classification Tree for 1960 Songs")
+
+text(data1960_DT, use.n=TRUE, all=TRUE, cex=.8)
+```
+
+```{r KPTree2000, echo = T, fig.dim=c(6,4)}
+set.seed(1)
+data2000_DT <- rpart(target ~ tempo + key + valence + danceability + energy + liveness, data=data2000, method="class", control = list(maxdepth = 10) )
+printcp(data2000_DT) # display the results 
+plotcp(data2000_DT) # visualize cross-validation results 
+summary(data2000_DT) # detailed summary of splits
+
+# plot tree 
+plot(data2000_DT, uniform=TRUE, main="Classification Tree for 2000 Songs")
+text(data2000_DT, use.n=TRUE, all=TRUE, cex=.8)
+```
+
+
+```{r Postscript, results=T}
+# create attractive postcript plot of tree 
+post(data1960_DT, file = "data1960.ps", title = "Classification Tree for 1960s Song List")
+post(data2000_DT, file = "data2000.ps", title = "Classification Tree for 2000s Song List")
+```
+
+
+
+Here are the results. 
+
+For the 1960s Song List:
+From the decision tree, the first branching point has 4321 popular and 4321 unpopular songs from the data. The first split yields 2015 outcomes with energy levels < 0.27 and 6627 outcomes with energy levels >= 0.27 for the popularity results for the song list.  The energy level was showns as being the most important variable to determine whether the song was popular or not.  The energy level being under 0.27 represents that the song was unpopular and the energy level greater than 0.27 deems the song as popular.  The variable that follows after the energy level was the variance level.  There were only two variables that determined the popularity of the songs making the Billboard Top 100 list. For the song to be considered popular, the energy of the song has to be equal to or greater than 0.27.  A further split on the left node might not have been beneficial to separate the popular and unpopular songs list. The algorithm actually stops there, and predicts unpopular for all 2015 observations, giving 476/2015 incorrect predictions. 
+
+Nonethelss, the lower branch continue to split, with  (67%) correct prediction on the last leave (node at end of branch) and 481/772 correct **non popular** prediction on the third leaf, while the last leaf predicted 3604/5905 **popular** correctly. Not too bad.
+
+Overall, when the model predicts **unpopular**, accuracy is (1539+481)/(1539+476+481+291) = `r round( (1539+481)/(1539+476+481+291)*100,1 )`%. And when the model predicts **popular**, accuracy is (29+12+12)/(29+0+12+0+12+2) = `r round( (29+12+12)/(29+0+12+0+12+2)*100,1 )`%.
+
+Now the 2000s Song List can be summarized:
+The decision tree starts the first branching point with 2936 popular and 2936 unpopular songs from the data presented from Spotify. The first split yields 1319 outcomes with danceability levels < 0.396 and 4553 outcomes with danceability levels >= 0.396 for the popularity results for the song list.  The danceability levels has been identified as the most important variable to determine whether the song was popular or not in the 2000s.  Danceability levels being under 0.396 represents that the song was unpopular while the danceability levels being greater than 0.396 are deemed as the song being popular.  The variables that follows after the danceability level are the energy and then valence levels.  Unlike the 1960s, there are three variables that determined the popularity of the songs making the Billboard Top 100 list. For the song to be considered popular, the danceability of the song has to be equal to or greater than 0.396.  A further split on the left node might not have been beneficial just like in the 1960s decision tree to separate the popular and unpopular songs list. The algorithm actually stops there, and predicts unpopular for all 1319 observations, giving 157/2015 incorrect predictions. 
+
+Nonethelss, the lower branch continue to split, with  (60%) correct prediction on the last leaf (node at end of branch) and 129/214 correct **non popular** prediction on the third leaf, while the last leaf predicted 609/976 **popular** correctly.
+
+Overall, when the model predicts **unpopular**, accuracy is (1539+481)/(1539+476+481+291) = `r round( (1539+481)/(1539+476+481+291)*100,1 )`%. And when the model predicts **popular**, accuracy is (29+12+12)/(29+0+12+0+12+2) = `r round( (29+12+12)/(29+0+12+0+12+2)*100,1 )`%.
+
+From the decision tables above we see that what made a song popular in the 1960s did not necessarily make a song popular in the 2000s.  They had one differing variable that made the difference.  In the 2000s, the most important variable for the song to make the Billboards Top 100 list was for the song to have danceability.  Songs like Hot in Herre by Nelly is a song that has the danceability that is talked about.  In the 1960s, a song needed to have energy as the most impoartant variable.  We can check our decision tables but creating confusion matrixes.
+
+These perentages for both the 1960s and 2000s songs can represent by the calculations below that are being examined in confusion matrixes.
+
+
+```{r KPConTab1960, results=T}
+loadPkg(caret) 
+cm_1960 = confusionMatrix( predict(data1960_DT, type = "class"), reference = data1960[, "target"] )
+print('Overall: ')
+cm_1960$overall
+print('Class: ')
+cm_1960$byClass
+unloadPkg(caret)
+```
+
+```{r KPTable1960, results="asis"}
+xkabledply(cm_1960$table, "confusion matrix")
+```
+
+```{r KPConTable2000, results=T}
+loadPkg(caret) 
+cm_2000 = confusionMatrix( predict(data2000_DT, type = "class"), reference = data2000[, "target"] )
+print('Overall: ')
+cm_2000$overall
+print('Class: ')
+cm_2000$byClass
+unloadPkg(caret)
+```
+
+
+```{r KPTable2000, results="asis"}
+xkabledply(cm_2000$table, "confusion matrix")
+```
+Now that the calculations are calculated in the confusion matrix, another method can be used and it uses the maxdepth with the results being put into a summary below.
+
+
+1960s Song Max Depth Summary:
+```{r KPmaxdepth1960}
+loadPkg(rpart)
+loadPkg(caret)
+
+# create an empty dataframe to store the results from confusion matrices
+confusionMatrixResultDf_1 = data.frame( Depth=numeric(0), Accuracy= numeric(0), Sensitivity=numeric(0), Specificity=numeric(0), Pos.Pred.Value=numeric(0), Neg.Pred.Value=numeric(0), Precision=numeric(0), Recall=numeric(0), F1=numeric(0), Prevalence=numeric(0), Detection.Rate=numeric(0), Detection.Prevalence=numeric(0), Balanced.Accuracy=numeric(0), row.names = NULL )
+
+for (deep in 2:6) {
+  fit1960 <- rpart(target ~ tempo + key + valence + danceability + energy + liveness, data=data1960, method="class", control = list(maxdepth = deep) )
+  # 
+  cm_1 = confusionMatrix( predict(fit1960, type = "class"), reference = data1960[, "target"] ) # from caret library
+  # 
+  cmaccu_1 = cm_1$overall['Accuracy']
+  # print( paste("Total Accuracy = ", cmaccu ) )
+  # 
+  cmt_1 = data.frame(Depth=deep, Accuracy = cmaccu_1, row.names = NULL ) # initialize a row of the metrics 
+  cmt_1 = cbind( cmt_1, data.frame( t(cm_1960$byClass) ) ) # the dataframe of the transpose, with k valued added in front
+  confusionMatrixResultDf_1 = rbind(confusionMatrixResultDf_1, cmt_1)
+  # print("Other metrics : ")
+}
+
+unloadPkg(caret)
+```
+
+The summarized result is here:
+
+```{r TreeClass, results="asis"}
+xkabledply(confusionMatrixResultDf_1, "1960s Song List Classification Trees summary with varying MaxDepth")
+```
+
+2000s Song Max Depth Summary:
+```{r KPmaxdepth2000}
+loadPkg(rpart)
+loadPkg(caret)
+
+# create an empty dataframe to store the results from confusion matrices
+confusionMatrixResultDf_2 = data.frame( Depth=numeric(0), Accuracy= numeric(0), Sensitivity=numeric(0), Specificity=numeric(0), Pos.Pred.Value=numeric(0), Neg.Pred.Value=numeric(0), Precision=numeric(0), Recall=numeric(0), F1=numeric(0), Prevalence=numeric(0), Detection.Rate=numeric(0), Detection.Prevalence=numeric(0), Balanced.Accuracy=numeric(0), row.names = NULL )
+
+for (deep in 2:6) {
+  fit2000 <- rpart(target ~ tempo + key + valence + danceability + energy + liveness, data=data2000, method="class", control = list(maxdepth = deep) )
+  # 
+  cm_2 = confusionMatrix( predict(fit2000, type = "class"), reference = data2000[, "target"] ) # from caret library
+  # 
+  cmaccu_2 = cm_2$overall['Accuracy']
+  # print( paste("Total Accuracy = ", cmaccu ) )
+  # 
+  cmt_2 = data.frame(Depth=deep, Accuracy = cmaccu_2, row.names = NULL ) # initialize a row of the metrics 
+  cmt_2 = cbind( cmt_2, data.frame( t(cm_2$byClass) ) ) # the dataframe of the transpose, with k valued added in front
+  confusionMatrixResultDf_2 = rbind(confusionMatrixResultDf_2, cmt_2)
+  # print("Other metrics : ")
+}
+
+unloadPkg(caret)
+```
+
+The summarized result is here:
+
+```{r TreeClass2, results="asis"}
+xkabledply(confusionMatrixResultDf_2, "2000s Song List Classification Trees summary with varying MaxDepth")
+```
+
+
+The following are two additional ways that we can plot out the categorical decision tree.  The additional methods are the 'rpart.plot' and 'fancy' plots to help read the tree easier.  Both the 1960s and 2000s songs have been placed into the models as follows:
+
+
+1960s Song Fancy and Rpart Plots
+```{r KPfancyplot_1960, results=T}
+loadPkg("rpart.plot")
+rpart.plot(data1960_DT)
+loadPkg("rattle") # For fancyRpartPlot (Trees) Answer "no" on installing from binary source
+fancyRpartPlot(data1960_DT)
+```
+
+2000s Song Fancy and Rpart Plots
+```{r KPfancyplot_2000, results=T}
+loadPkg("rpart.plot")
+rpart.plot(data2000_DT)
+loadPkg("rattle") # For fancyRpartPlot (Trees) Answer "no" on installing from binary source
+fancyRpartPlot(data2000_DT)
+```
+
+
+## Prune the tree
+
+We can now prune the decision trees to get the most important results to know what variables are most important to be put onto the Billboards Top 100 list.  The following are the pruning of the trees:
+
+```{r KPprune1960, results=T}
+#prune the tree 
+PT_data1960_DT <- prune(data1960_DT, cp = data1960_DT$cptable[2,"CP"])
+#pkyphosisfit <- prune(kyphosisfit, cp = kyphosisfit$cptable[which.min( kyphosisfit$cptable[,"xerror"] ),"CP"])
+
+# plot the pruned tree 
+fancyRpartPlot(PT_data1960_DT)
+# For boring plot, use codes below instead
+plot(PT_data1960_DT, uniform=TRUE, main="Pruned Classification Tree for 1960s Song List")
+text(PT_data1960_DT, use.n=TRUE, all=TRUE, cex=.8)
+```
+
+
+```{r KPprune2000, results=T}
+#prune the tree 
+PT_data2000_DT <- prune(data2000_DT, cp = data2000_DT$cptable[2,"CP"])
+#pkyphosisfit <- prune(kyphosisfit, cp = kyphosisfit$cptable[which.min( kyphosisfit$cptable[,"xerror"] ),"CP"])
+
+# plot the pruned tree 
+fancyRpartPlot(PT_data2000_DT)
+# For boring plot, use codes below instead
+plot(PT_data2000_DT, uniform=TRUE, main="Pruned Classification Tree for 2000s Song List")
+text(PT_data2000_DT, use.n=TRUE, all=TRUE, cex=.8)
+```
+
+From the pruned trees, the results show different variables for each year on what classified them to get on the Billboards Top 100 List.  For the 1960s songs, the song needed to have an energy level greater than 0.27.  This is shown as the most independent variable that determines the popularity of a song.  In order for a song in the 2000s to make the list, the danceability matter more than energy.  The dancebility had to be greater than a level of 0.40.  In the two eras, there were differences in what was deemed as most important.  In the 1960s, a person needed to have the right energy being eluded from the music while in the 2000s the song had to be a danceable song.
+
 
 # Summary of Results
 
