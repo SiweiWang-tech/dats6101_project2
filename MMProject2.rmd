@@ -102,33 +102,33 @@ outlierKD2 <- function(df, var, rm=FALSE) {
 
 # Purpose:
 
-The purpose of this study it to analyse the affect of music attributes, such as tempo, key, mode, etc, on the popularity of songs with respect to time.  Specifically, the SMART question for this study is: Does the key, valence, tempo, or other musical attributes changes between popular songs, and not popular songs for contrast, in the 1960's versus songs from the early 2000's?
+The purpose of this study is to analyse the affect of music attributes, such as tempo, key, mode, etc, on the popularity of songs with respect to time.  Specifically, the SMART question for this study is: Does the key, valence, tempo, or other musical attributes change between popular songs, and not popular songs for contrast, in the 1960's versus songs from the early 2000's?
 
-The methodology by which this will be accomplished is to analyze song attribute data collected from Spotify using their application programming interface (API).  This attribute data collects the following features for every song, or "track", under review: track, artist, key, mode, valence, tempo, "energy", "liveness", and "danceability".  The popularility of each song will be a binary attribute: A song will be considered popular if it appears in the Billboard Hot 100, a weekly top list of the popular tracks from each week measured by Billboard Magazine.  Billboard Magazine is the widely considered standard for song popularity and has existed since the 1960s through today and, so, represents a consistent standard for measuring song popularity through time.
+The methodology by which this will be accomplished is to analyze song attribute data collected from Spotify using their application programming interface (API) and compare these attribute values between "popular" and not-"popular" songs from two decades, the 1960's and the 2000's.  Spotify API attribute data collects the following features for every song, or "track", under review: track, artist, key, mode, valence, tempo, "energy", "liveness", and "danceability".  The popularility of each song will be a binary attribute: A song will be considered popular if it appears in the Billboard Hot 100, a weekly top list of the popular tracks from each week measured by Billboard Magazine.  Billboard Magazine is the widely considered standard for song popularity and has existed since the 1960s through today and, so, represents a consistent standard for measuring song popularity through time.
 
 # A Discussion of Basic Music Theory
 
 Music, as an art, has a long and varied history depending on the era and geographical space in which an individual may be concerned.  While the purpose of this study is to identify the change of popular music, at least over a short period since what is 50 years to the entire timeline of the human species over which music in some form is sure to have been evident, the entire history of what music is composed and how it is written or expressed will not be discussed herein.  Instead, this study is focused on contemporary, American-produced songs, and so, certain objective measurements of song qualities, namely tempo, key, and mode, can be used to compare and contrast songs both across the musically spectrum, from say jazz to rock-and-roll, and through time.
 
-Tempo, key, and mode are relatively basic concepts in music theory.  The beat is the basic unit of time in music, the pace at which the music pulses; it is, essentially, when a listener would tap their toe during a song.  **Tempo** is the speed or pace of a given song and is often measured beats per minute.  Certain genres of songs are defined by high tempos, like electric-dance music (EDM), but most genres vary considerably in their tempo.  Pitch is the audio frequency at which individual notes within the song are heard by the listener.  In general terms, the **key** of a song is average pitch of a song, or the pitch around which a song fluctuates; performing a song in a higher key means that all of the notes of a song are increased at a level commiserate with the change in key (a major key change from "C'" to "D", one pitch, would change the pitch of all notes in the song up pitch as well).  Along the same concept as key, **mode** is the interval at which pitches are expressed in a song and is expressed as either "minor" or "major".  The key and mode are often expressed together when describing the pitch qualities of a song, such as "F major" or "D minor".  From an audio perspective, "major" keys are more often associated with and evoke happy or bright melodies, whereas "minor" keys may sound melancholic.
+Tempo, key, and mode are relatively basic concepts in music theory.  The beat is the basic unit of time in music, the pace at which the music pulses; it is, essentially, when a listener would tap their toe during a song.  **Tempo** is the speed or pace of a given song and is often measured in beats per minute.  Certain genres of songs are defined by high tempos, like electric-dance music (EDM), but most genres vary considerably in their tempo.  Pitch is the audio frequency at which individual notes within the song are heard by the listener.  In general terms, the **key** of a song is the average pitch of a song, or the pitch around which a song fluctuates; performing a song in a higher key means that all of the notes of a song are increased at a level commiserate with the change in key (a major key change from "C'" to "D", one pitch, would change the pitch of all notes in the song up pitch as well).  Along the same concept as key, **mode** is the interval at which pitches are expressed in a song and is expressed as either "minor" or "major".  The key and mode are often expressed together when describing the pitch qualities of a song, such as "F major" or "D minor".  From an audio perspective, "major" keys are more often associated with and evoke happy or bright melodies, whereas "minor" keys may sound melancholic.
 
-The concepts discussed here are general introduction to the features that will be discussed as part of this study's dataset, and the format herein does not support audio examples, which would be necessary for any comprehensive understanding of music theory.  Additional discussion of tempo, key, and mode, with audio examples for the differences between keys and modes, can be found [here](https://www.youtube.com/watch?v=rgaTLrZGlk0).
+The concepts discussed here are general introduction to the features that will be discussed as part of this study's dataset, and the format of this study herein, namely a written report, does not support audio examples, which would be necessary for any comprehensive understanding of music theory.  Additional discussion of tempo, key, and mode, with audio examples for the differences between keys and modes, can be found [here](https://www.youtube.com/watch?v=rgaTLrZGlk0).
 
 # Data Selection:
 
-As identified in the methodology statement, the data in this study is pulled from two corporate sources, Spotify Technology S.A. (Spotify) and the Billboard-Hollywood Media Group.  Spotify is a popular online streaming service for music, videos, and podcasts.  Spotify provides an "Audio Analysis" of a musical tracks that describes the structure of the tracks and its musical content, including tempo, key, and mode, discussed above, in addition to more sophisticated musical metrics relating multiple core concepts of music.  The advance metrics that will be tracked from Spotify Audio Analysis in this study are valence, "danceability", "energy", and "liveness"; these metrics are discussed further below.  The Billboard-Hollywood Media Group owns and produces the "Billboard" magazine.  This publication is famous for the Billboard Hot 100 list, a weekly-published list that identifies the most popular, American songs of the week, based on sales and digital downloads and streams.  The Billboard Hot 100 have been in publication since 1958 and establishes an objective standard for identifies popular songs for the purposes of this study.
+As identified in the methodology statement, the data in this study is pulled from two corporate sources, Spotify Technology S.A. (Spotify) and the Billboard-Hollywood Media Group.  Spotify is a popular online streaming service for music, videos, and podcasts.  Spotify provides an "Audio Analysis" of a musical track that describes the structure of the track and its musical content, including tempo, key, and mode discussed above, in addition to more sophisticated musical metrics relating multiple core concepts of music.  The advanced metrics that will be tracked from Spotify Audio Analysis in this study are valence, "danceability", "energy", and "liveness"; these metrics are discussed further below.  The Billboard-Hollywood Media Group owns and produces the "Billboard" magazine.  This publication is famous for the Billboard Hot 100 list, a weekly-published list that identifies the most popular, American songs of the week, based on sales and digital downloads and streams.  The Billboard Hot 100 has been in publication since 1958 and establishes an objective standard for identifies popular songs for the purposes of this study.
 
 Based on the source from which popular songs are determined, the conclusions of this study should only apply to songs produced or with a large-commerical release in the United States of America.  Song features for popular songs based on similar metrics of sales and digital views from other countries may vary from the results reported herein.
 
-The data analyized herein was pulled from the Kaggle database website.  The specific dataset can be found [here](https://www.kaggle.com/theoverman/the-spotify-hit-predictor-dataset).
+The data analyized herein was pulled from the Kaggle database website, from a dataset collected and produced by user, Farooq Ansari.  The specific dataset can be found [here](https://www.kaggle.com/theoverman/the-spotify-hit-predictor-dataset).
 
 # Data Background:
 
 As stated previously, the Spotify Audio Analysis records multiple features for each track in its extensive collection of music titles.  Some of these features, such as tempo, key, and mode, have strict definitions within the music community and are, otherwise, clear, quantifiable variables (e.g., tempo is measured in beats per minute).  Other features do not have strict definitions within the music community and/or do not have a clear, quantifiable standard that can be measured within each track.  The following features are ranked in Spotify's analyses on a scale of 0 to 1 and will be considered for analysis in this study: [^1]
-- **Valence** describes the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).  For perspective: from the 2000's data set, one popular song with a high valence (0.965) is OutKast's [Hey Ya](https://open.spotify.com/track/2PpruBYCo4H7WOBJ7Q2EwM?si=3b7dll0ITZ-H5FsIu-qGig), while a song with low valence (0.0356) is deadmau5's [Strobe](https://open.spotify.com/track/31NiyZrUd1r4icY7xkvnWv?si=przVh9EjRgG-oyH5rInY9A).
-- **Danceability** describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. For perspective: from the 2000's data set, one popular song with a high danceability (0.956) is Nelly's [Hot in Herre](https://open.spotify.com/track/04KTF78FFg8sOHC1BADqbY?si=i8f_wIreTsu34rIpSX4PDA), while a song with low danceability (0.0356) is Venom's [Black Metal](https://open.spotify.com/track/3yNoEJifUJdly8ucYoWRwl?si=15rDImzOTkSfJlpggbrPLw). 
-- **Energy** represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy. For perspective: from the 2000's data set, one popular song with a high energy (0.991) is Fatboy Slim's [The Rockafeller Skank](https://open.spotify.com/track/7mCQK9YB25WZw1saUjfL4e?si=46Rwt-TMQgusLo_Wjm3o0g), while a song with low energy (0.0013) is Alvin Curran's [Inner Cities II](https://open.spotify.com/track/4De0j0rVNmezk0EXPzOtwZ?si=ShNPfVWrQfKzZPiBlxKS-g).
-- **Liveness** detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. For perspective: from the 2000's data set, one popular song with a high liveness (0.959) is Metallica's [No Leaf CLover - Live](https://open.spotify.com/track/0n4AllHzf3ma4ki20Y9h00?si=d3-JKQO9SOeTVxMzNhOYYQ), while any studio-produced song would have a low liveness.
+- **Valence** describes the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).  For perspective: from the 2000's data set, one popular song with a high valence (0.965) is OutKast's ["Hey Ya"](https://open.spotify.com/track/2PpruBYCo4H7WOBJ7Q2EwM?si=3b7dll0ITZ-H5FsIu-qGig), while a song with low valence (0.0356) is deadmau5's ["Strobe"](https://open.spotify.com/track/31NiyZrUd1r4icY7xkvnWv?si=przVh9EjRgG-oyH5rInY9A).
+- **Danceability** describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. For perspective: from the 2000's data set, one popular song with a high danceability (0.956) is Nelly's ["Hot in Herre"](https://open.spotify.com/track/04KTF78FFg8sOHC1BADqbY?si=i8f_wIreTsu34rIpSX4PDA), while a song with low danceability (0.0356) is Venom's ["Black Metal"](https://open.spotify.com/track/3yNoEJifUJdly8ucYoWRwl?si=15rDImzOTkSfJlpggbrPLw). 
+- **Energy** represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy. For perspective: from the 2000's data set, one popular song with a high energy (0.991) is Fatboy Slim's ["The Rockafeller Skank"](https://open.spotify.com/track/7mCQK9YB25WZw1saUjfL4e?si=46Rwt-TMQgusLo_Wjm3o0g), while a song with low energy (0.0013) is Alvin Curran's ["Inner Cities II"](https://open.spotify.com/track/4De0j0rVNmezk0EXPzOtwZ?si=ShNPfVWrQfKzZPiBlxKS-g).
+- **Liveness** detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. For perspective: from the 2000's data set, one popular song with a high liveness (0.959) is Metallica's ["No Leaf CLover - Live"](https://open.spotify.com/track/0n4AllHzf3ma4ki20Y9h00?si=d3-JKQO9SOeTVxMzNhOYYQ), while any studio-produced song would have a low liveness.
 
 The full analysis of these features, namely the methods or calculations by which their values are determined, are not released by Spotify, potentially due to intellectual property reasons.
 
@@ -138,24 +138,31 @@ The Billboard Hot 100 has several component charts that contribute to the overal
 - **Digital Songs**: Digital sales are tracked by Nielsen SoundScan and are included as part of a title's sales points.
 - **Streaming Songs**: a collaboration between Billboard, Nielsen SoundScan and National Association of Recording Merchandisers which measures the top streamed radio songs, on-demand songs and videos on leading online music services.
 
-From these varied and independent sources, the Billboard Hot 100 represents a nuetral and storied arbiter of the objective popularity of songs from 1958 thorugh the present, including all songs to be evaluated from the 1960s and early 2000s.
+From these varied and independent sources, the Billboard Hot 100 represents a nuetral and storied arbiter of the objective popularity of songs from 1958 thorough the present, including all songs to be evaluated from the 1960s and early 2000s.
 
 # Data Preprocessing
 
 The Spotify Audio Analysis stores up to 42 music features for each track.  For the purposes of this study, only the following variables will be analyzed and reviewed:
 
-``` {r DataImport, include = F, results = F}
-loadPkg('tidyverse')
+``` {r DataImport_Gude, include = F, results = F}
+loadPkg('tidyverse')    # For general functions
+loadPkg('plyr')
 
 # Import 1960's and 2000's data as separate dataframes
 data1960 <- subset(data.frame(read_csv('dataset-of-60s.csv')), select = c('track', 'artist', 'tempo', 'key', 'mode', 'valence', 'danceability', 'energy', 'liveness', 'target'))
 data2000 <- subset(data.frame(read_csv('dataset-of-00s.csv')), select = c('track', 'artist', 'tempo', 'key', 'mode', 'valence', 'danceability', 'energy', 'liveness', 'target'))
-# Provide a summary of the columns and data within the data
-summary(data2000)
-length((which(data2000$target == 1)))
-nrow(subset(data2000,target == 0))
-length(data1960$target[data1960$target == 1])
-length(data1960$target[data1960$target == 0])
+# Change certain columns to factors as necessary
+data1960$mode <- as.factor(data1960$mode)
+data2000$mode <- as.factor(data2000$mode)
+data1960$target <- as.factor(data1960$target)
+data2000$target <- as.factor(data2000$target)
+
+data1960_X <- subset(data1960, select = c('tempo', 'key', 'valence', 'danceability', 'energy', 'liveness', 'mode'))
+data2000_X <- subset(data2000, select = c('tempo', 'key', 'valence', 'danceability', 'energy', 'liveness', 'mode'))
+
+# Create a dataframe of just popular songs with a new variable for year to distinguish popular songs by year
+dataPopular <- bind_rows(mutate(subset(data1960,target ==1), year=1960), mutate(subset(data2000,target ==1), year=2000))
+dataPopular$year <- as.factor(dataPopular$year)
 ```
 
 **Track Variables of Interest:**
@@ -170,36 +177,650 @@ length(data1960$target[data1960$target == 0])
 8. Energy: a float value between 0 and 1 for the relative energy of the track (discussed in the Data Background)
 9. Liveness: a float value between 0 and 1 for the relative liveness of the track (discussed in the Data Background)
 
-In preprocessing the data, all of the variables from the Spotify data not listed above were eliminated from the study dataset.
+For the purposes of data processing: key will be treated as a numeric value as the scaling nature of keys is suitable for modeling herein - each whole number change in key generally transposes to a constant change on the pitch scale, for C to C*#*/D*b* to D across numerals 0, 1, and 2 for example - and mode will be treated as a categorical (factor) value.  In preprocessing the data, all of the variables from the Spotify data not listed above were eliminated from the study dataset.
 
-The final feature, **Target**, was computed from the collective data from Billboard's Hot 100 list.  Any track listed in the Billboard Hot 100 during the respective decade from which a track was released is given a value of 1, and any track not list at any point in the Billboard Hot 100 is given a 0.
+The final feature, **Target**, was computed from the collective data from Billboard's Hot 100 list as is represented as a categorical (factor) variable.  Any track listed in the Billboard Hot 100 during the respective decade from which a track was released is given a value of 1, and any track not list at any point in the Billboard Hot 100 is given a 0.
 
-This study will examine the change in music metrics affecting popularity with respect to time.  For this purpose, this study will analyze two datasets, one with songs released during the 1960s, containing `r nrow(data1960)` songs, and the other with songs released from the 2000s, containing `r nrow(data2000)` songs.  Each dataset is composed of an equal number of popular and not popular songs, `r nrow(subset(data2000,target == 1))` popular and not popular songs from the 2000s and `r nrow(subset(data1960,target == 1))` popular and not popular songs from the 1960s.  For every song that appears in the Billboard Hot 100 list from their respective decade (with a target value of 1), another song from the same decade, not appearing in the Hot 100 was chosen to fill in the dataset for analytics and review.
+This study will examine the change in music metrics affecting popularity with respect to time.  For this purpose, this study will analyze two datasets, one with songs released during the 1960s, containing `r nrow(data1960)` songs, and the other with songs released from the 2000s, containing `r nrow(data2000)` songs.  Each dataset is composed of an equal number of popular and not popular songs, `r nrow(subset(data2000,target == 1))` popular and not popular songs from the 2000s and `r nrow(subset(data1960,target == 1))` popular and not popular songs from the 1960s.  For every song that appears in the Billboard Hot 100 list from their respective decade (with a target value of 1), another song from the same decade, not appearing in the Hot 100 was chosen to fill in the dataset for analytics and review.  Non-popular songs that were chosen from American-produced songs at random from across music genres with the attempt to capture a suitable mix of music qualities.
 
-A summary of the variables and their values from the entire 2000's and 1960's datasets are presented below:
+A summary of the track musical features and their values from the entire 2000's and 1960's datasets are presented below:
 
-``` {r DataSummary}
-# Provide a summary of the columns and data within the data
-print('A Summary of the 2000\'s Dataset:')
-summary(data2000)
+```{r xkablesummary_KP}
+#loadPkg('Rtools')
+loadPkg('xtable')
+loadPkg('kableExtra')
+loadPkg('stringi')
 
-print('A Summary of the 1960\'s Dataset:')
-summary(data1960)
+xkabledply = function(smmry, title='Caption', pos='left') { 
+  smmry %>%
+    xtable() %>% 
+    kable(caption = title, digits = 4) %>%
+    kable_styling(position = "center") %>%
+    kable_styling(bootstrap_options = "striped", full_width = F,
+    position = pos)
+}
+
+xkablesummary = function(df) { 
+  
+  s = summary(df) %>%
+    apply( 2, function(x) stringr::str_remove_all(x,c("Min.\\s*:\\s*","1st Qu.\\s*:\\s*","Median\\s*:\\s*","Mean\\s*:\\s*","3rd Qu.\\s*:\\s*","Max.\\s*:\\s*")) ) %>% 
+    apply( 2, function(x) stringr::str_trim(x, "right")) 
+  
+  colnames(s) <- stringr::str_trim(colnames(s))
+  
+  if ( dim(s)[1] ==6 ) { rownames(s) <- c('Min','Q1','Median','Mean','Q3','Max') 
+  } else if ( dim(s)[1] ==7 ) { rownames(s) <- c('Min','Q1','Median','Mean','Q3','Max','NA') }
+  
+  s %>%
+    xkabledply("Table: Statistics summary.", "center")
+
+}
+
+xkablevif = function(model) {
+  vifs = table( names(model$coefficients)[2:length(model$coefficients)] ) 
+  vifs[] = faraway::vif(model) 
+
+  vifs %>%
+    xtable() %>% 
+    kable(caption = "VIFs of the model", digits = 4, col.names = 'VIF') %>% 
+    kable_styling(position = "center") %>%
+    kable_styling(bootstrap_options = "striped", full_width = F,
+    position = "left")
+}
 ```
 
-# Variable Anaylsis and Approach
+```{r DataSummary_KP, results='asis'}
+print('A Summary of the 1960\'s Dataset:')
+xkablesummary(data1960_X)
+print('A Summary of the 2000\'s Dataset:')
+xkablesummary(data2000_X)
+```
 
-The purpose of this study is to identify any link or lackthereof between the popularity of a song and seven other factors, tempo, key, mode, valence, danceability, energy, and liveness, based on track metric data computed from Spotify.  A cursory review of the song feature values for just popular between the two decades shows a difference in the mean values for multiple song features.  From the 1960's to the early 2000's, the mean valence noticeably decreases while the mean danceability and energy values noticeably increase.
+# Variable Anaylsis and Approach - Krystal
 
-``` {r DataSummary}
+The purpose of this study is to identify any link or lackthereof between the popularity of a song and seven other factors, tempo, key, mode, valence, danceability, energy, and liveness, based on track metric data computed from Spotify.  For the two decades under review, 1960 and 2000, this study will quantify the specific differences in musical factors between popular and not-popular songs from each decade as well as between popular songs between the decades via three models: **K-Nearest Neighbor**, **Random Forest**, and **Logistic Regression**.  For each model, the accuracy of the model in predicting the popularity of song from its musical factors will be assessed and the principal musical features from the model with the highest accuracy will be compared between popular and non-popular songs within and between decades.
+
+# Exploratory Data Analysis - Krystal
+
+A cursory review of the song feature values for just popular between the two decades, shown below, shows a difference in the mean values for multiple song features, for instance: From the 1960's to the early 2000's, the mean valence noticeably decreases while the mean danceability and energy values noticeably increase.
+
+``` {r PopDataSummary_KP}
 # Provide a summary of the columns and data within the data
 print('A Summary of the Popular 2000\'s Tracks:')
-summary(subset(data2000, target == 1))
+xkablesummary(subset(data2000, target == 1, select = c('tempo', 'key', 'valence', 'danceability', 'energy', 'liveness', 'mode')))
 
 print('A Summary of the Popular 1960\'s Tracks:')
-summary(subset(data1960, target == 1))
+xkablesummary(subset(data1960, target == 1, select = c('tempo', 'key', 'valence', 'danceability', 'energy', 'liveness', 'mode')))
 ```
 
+A presentation and analysis of the distributions of each of the variables prior to modeling is presented below.  For each histogram, data from the 1960's will be presented consistently in blue, while data from the 2000's will be presented in red.  Data from popular songs will be displayed in histograms overlaping the collective data with a darker shade of blue or red for 1960 and 2000 data, respectively.  The Shapiro-Wilke Test for determining normality of data has a null hypothesis (H<sub>0</sub>:) stating the data is normally distributed; that is to say, a probablity value below 0.05 (corresponding to a confidence interval of 95%) from the test means that the null hypothesis must be rejected, and the data to which the test was applied is not normally-distributed.
+
+When comparing the statistical equivalency of two values, a Two-Tailed T-Test is performed to determine whether the two values are statistically equivalent.  The null hypothesis for the Two-Tailed T-Test ((H<sub>0</sub>:) is that the two values are statistically equivalent (or their true difference in mean value is equal to 0); that is to say, a probability value less than 0.025 (corresponding to a confidence interval of 95%) from the test means that the null hypothesis must be rejected, and the two values are **not** statistically equivalent.
+
+## An Exploration of Tempo
+
+### Tempo Histograms
+Discussed above, **Tempo** is the speed or pace of a given song and is often measured in beats per minute.  Distributions of the tempo of `r nrow(data1960)` songs from the 1960's and `r nrow(data2000)` songs from the 2000's are presented below with darker shades showing the distributions of the popular songs within each dataset and the mean value of each set represented by a dashed line:
+
+```{r EDA_Tempo_Gude}
+# Set up a conditional for mean lines
+temp60Line <- ddply(data1960, "target", summarise, tempo.mean=mean(tempo))
+temp00Line <- ddply(data2000, "target", summarise, tempo.mean=mean(tempo))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = data1960, aes(x = tempo, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Tempo in 1960's Songs") +
+  labs(x="Tempo (Beats/Minute)", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#00aaaa", "#000080")) +
+  scale_fill_manual(values=c("#00aaaa", "#000080")) +
+  geom_vline(data= temp60Line, aes(xintercept=tempo.mean, color=target),
+             linetype="dashed")
+
+# Produce a two part graph for popular and non-popular songs from 2000
+ggplot(data = data2000, aes(x = tempo, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Tempo in 2000's Songs") +
+  labs(x="Tempo (Beats/Minute)", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("firebrick2", "red4")) +
+  scale_fill_manual(values=c("firebrick2", "red4")) +
+  geom_vline(data= temp00Line, aes(xintercept=tempo.mean, color=target),
+             linetype="dashed")
+```
+
+From the general trends in the histogram data above, it can be seen that the tempo for popular songs in 1960 skews higher than for non-popular songs, from an average tempo of `r mean(subset(data1960, target == 1)$tempo)` beats per minute for popular songs versus `r mean(subset(data1960, target == 0)$tempo)` beats per minute for non-popular songs.  Whereas the reverse is true for popular songs in the 2000's - the tempo for popular songs in 2000 skews lower than for non-popular songs, from an average tempo of `r mean(subset(data2000, target == 1)$tempo)` beats per minute for popular songs versus `r mean(subset(data2000, target == 0)$tempo)` beats per minute for non-popular songs.
+
+The distributions of tempo for just the popular songs from the two decades under review are presented below:
+
+```{r EDA_PopTempo_Gude}
+# Set up a conditional for mean lines
+tempPopLine <- ddply(dataPopular, "year", summarise, tempo.mean=mean(tempo))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = dataPopular, aes(x = tempo, fill = year)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Tempo in Popular Songs from the 1960's and 2000's") +
+  labs(x="Tempo (Beats/Minute)", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#000080", "red4")) +
+  scale_fill_manual(values=c("#000080", "red4")) +
+  geom_vline(data= tempPopLine, aes(xintercept=tempo.mean, color=year),
+             linetype="dashed")
+```
+
+From the general trend in the histogram data above, it can be seen that the tempo distribution of popular songs is different between the two decades, with the 1960's having a sharper peak of tempos near the mean for the decade and the 2000's distribution being more skewed left in comparison.  The mean tempo of either decade appears to be distinct as well, but only just so - the two values are very similar. Additional T-Testing may confirm if the two values can be considered statistically equivalent or not.
+
+### Tempo Normality Testing
+While the shape of each of the histograms from each decade and popularity potentially appear normally-distributed, the Shapiro-Wilke Test (H<sub>0</sub>: the data is normally-distributed) identifies the following for each sub-category of decade and popularity:
+
+``` {r test_tempo_Gude, include=F}
+format(shapiro.test(subset(data1960,target ==1)$tempo)$p.value, digits = 4)
+format(shapiro.test(subset(data1960,target ==0)$tempo)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==1)$tempo)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==0)$tempo)$p.value, digits = 4)
+```
+
+**Shapiro-Wilke Normality Test:**
+1960's Popular Probabality Value:       `r format(shapiro.test(subset(data1960,target ==1)$tempo)$p.value, digits = 4)`
+1960's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data1960,target ==0)$tempo)$p.value, digits = 4)`
+2000's Popular Probabality Value:       `r format(shapiro.test(subset(data2000,target ==1)$tempo)$p.value, digits = 4)`
+2000's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data2000,target ==0)$tempo)$p.value, digits = 4)`
+
+For all of the categories above, the Shapiro-Wilke probability was significantly less than 0.05 and, thus, the data is not normally distributed.
+
+### Tempo Difference Among Popular Songs Between Decades
+Considering only popular music, the mean tempo for 1960's music is `r format(mean(subset(data1960, target == 1)$tempo), digits = 1)` beats per minute, and the mean tempo for 2000's music is `r format(mean(subset(data2000, target == 1)$tempo), digits = 1)` beats per minute.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean tempos from either decade are statistically equivalent:
+
+```{r tempo_TTest_Gude}
+# Perform tst
+ttest_tempo = t.test(subset(data1960,target ==1)$tempo, subset(data2000,target ==1)$tempo)
+ttest_tempo
+```
+
+With a probability value of `r ttest_tempo$p.value` (p > 0.025), the T-Test null hypothesis is **not** rejected (albeit just barely), and the mean tempo values between the 1960's and 2000's decades should be considered equivalent (or their true difference in means is equal to 0).
+
+## An Exploration of Key
+
+### Key Histograms
+Discussed above, the **Key** of a song is the average pitch of a song, or the pitch around which a song fluctuates.  There are 12 keys represented in the integer mapping from both the 1960's and 2000's data; specifically, the following intergers map to the accompanying keys: 0 = C key, 1 = C*#*/D*b*, 2 = D, 3 = D*#*/E*b*, 4 = E, 5 = F, 6 = F*#*/G*b*, 7 = G, 8 = G*#*/A*b*, 9 = A, 10 = A*#*/B*b*, and 11 = B.  Distributions of the keys of `r nrow(data1960)` songs from the 1960's and `r nrow(data2000)` songs from the 2000's are presented below with darker shades showing the distributions of the popular songs within each dataset and the mean value of each set represented by a dashed line:
+
+```{r EDA_Key_Gude}
+# Set up a conditional for mean lines
+key60Line <- ddply(data1960, "target", summarise, key.mean=mean(key))
+key00Line <- ddply(data2000, "target", summarise, key.mean=mean(key))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = data1960, aes(x = key, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Key in 1960's Songs") +
+  labs(x="Key", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#00aaaa", "#000080")) +
+  scale_fill_manual(values=c("#00aaaa", "#000080")) +
+  geom_vline(data= key60Line, aes(xintercept=key.mean, color=target),
+             linetype="dashed")
+
+# Produce a two part graph for popular and non-popular songs from 2000
+ggplot(data = data2000, aes(x = key, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Key in 2000's Songs") +
+  labs(x="Key", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("firebrick2", "red4")) +
+  scale_fill_manual(values=c("firebrick2", "red4")) +
+  geom_vline(data= key00Line, aes(xintercept=key.mean, color=target),
+             linetype="dashed")
+```
+
+From the general trends in the histogram data above, there may be a slight higher shift in the distribution of keys for popular songs in 1960 versus the keys of non-popular songs, from an average key of `r mean(subset(data1960, target == 1)$key)` for popular songs versus `r mean(subset(data1960, target == 0)$key)` for non-popular songs.  Whereas the reverse may be true for popular songs in the 2000's - the key for popular songs in 2000 skews just slightly lower than for non-popular songs, from an average key of `r mean(subset(data2000, target == 1)$key)` for popular songs versus `r mean(subset(data2000, target == 0)$key)` for non-popular songs, although the difference appearance to be negligible.
+
+The distributions of key for just the popular songs from the two decades under review are presented below:
+
+```{r EDA_PopKey_Gude}
+# Set up a conditional for mean lines
+keyPopLine <- ddply(dataPopular, "year", summarise, key.mean=mean(key))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = dataPopular, aes(x = key, fill = year)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Key in Popular Songs from the 1960's and 2000's") +
+  labs(x="Key", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#000080", "red4")) +
+  scale_fill_manual(values=c("#000080", "red4")) +
+  geom_vline(data= keyPopLine, aes(xintercept=key.mean, color=year),
+             linetype="dashed")
+```
+
+From the general trend in the histogram data above, it can be seen that the tempo distribution of popular songs is different between the two decades, with the 1960's trending to the lower key values in comparison to the 2000's distribution.  The mean key of either decade appears to be distinct as well with the 1960's having a lower average key in comparison to the 2000's. Additional T-Testing may confirm if the two values can be considered statistically equivalent or not.
+
+### Key Normality Testing
+The shape of each of the histograms from each decade and popularity do not appear normally-distributed; instead they appear closer to a uniform distribution.  To confirm this observation, the Shapiro-Wilke Test (H<sub>0</sub>: the data is normally-distributed) identifies the following for each sub-category of decade and popularity for key distributions:
+
+``` {r test_key_Gude, include=F}
+format(shapiro.test(subset(data1960,target ==1)$key)$p.value, digits = 4)
+format(shapiro.test(subset(data1960,target ==0)$key)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==1)$key)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==0)$key)$p.value, digits = 4)
+```
+
+**Shapiro-Wilke Normality Test:**
+1960's Popular Probabality Value:       `r format(shapiro.test(subset(data1960,target ==1)$key)$p.value, digits = 4)`
+1960's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data1960,target ==0)$key)$p.value, digits = 4)`
+2000's Popular Probabality Value:       `r format(shapiro.test(subset(data2000,target ==1)$key)$p.value, digits = 4)`
+2000's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data2000,target ==0)$key)$p.value, digits = 4)`
+
+For all of the categories above, the Shapiro-Wilke probability was significantly less than 0.05 and, thus, none of the key distributions should be considered normally-distributed.
+
+### Key Difference Among Popular Songs Between Decades
+Considering only popular music, the mean key for 1960's music is `r format(mean(subset(data1960, target == 1)$key), digits = 1)`, and the mean key for 2000's music is `r format(mean(subset(data2000, target == 1)$key), digits = 1)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean keys from either decade are statistically equivalent:
+
+```{r key_TTest_Gude}
+# Perform t-test
+ttest_key = t.test(subset(data1960,target ==1)$key, subset(data2000,target ==1)$key)
+ttest_key
+```
+
+With a probability value of `r ttest_key$p.value` (p > 0.025), the T-Test null hypothesis is **not** rejected, and the mean key values between the 1960's and 2000's decades should be considered equivalent (or their true difference in means is equal to 0).
+
+## An Exploration of Mode
+
+### Mode Bar Charts
+Discussed above, the **Mode** of a song is the interval at which pitches are expressed in a song and is expressed as either "minor" or "major", where the major key is associated with melodies that are cheery or bright while the minor key is associated with melancholic melodies.  The mode is a binary categorical variable with an integer mapping of 0 for minor keys and 1 for major keys.  Bar charts of the mode values of `r nrow(data1960)` songs from the 1960's and `r nrow(data2000)` songs from the 2000's are presented below with darker shades showing the mode values of the popular songs within each dataset (bars are not overlapping):
+
+```{r EDA_Mode_Gude}
+# Produce a two part bar chart for popular and non-popular songs from 1960
+ggplot(data = data1960, aes(mode)) + 
+  geom_bar(aes(fill = target)) +
+  labs(title="Bar Chart of Mode in 1960's Songs") +
+  labs(x="Mode", y="Count") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_fill_manual(values=c("#00aaaa", "#000080")) +
+  theme_minimal()
+
+# Produce a two part bar chart for popular and non-popular songs from 1960
+ggplot(data = data2000, aes(mode)) + 
+  geom_bar(aes(fill = target)) +
+  labs(title="Bar Chart of Mode in 2000's Songs") +
+  labs(x="Mode", y="Count") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_fill_manual(values=c("firebrick2", "red4")) +
+  theme_minimal()
+```
+
+The percentage of popular songs from the 1960's with a major key (mode = 1) is `r mean(as.integer(subset(data1960, target==1)$mode)-1)*100`%, which is greater than the percentage of non-popular songs from the 1960's with a major key at `r mean(as.integer(subset(data1960, target==0)$mode)-1)*100`%.  Similarly, the percentage of popular songs from the 2000's with a major key (`r mean(as.integer(subset(data2000, target==1)$mode)-1)*100`%) is greater than the percentage of non-popular songs with a major key (`r mean(as.integer(subset(data2000, target==0)$mode)-1)*100`%).  These trends show a general shift in popular songs towards the major key which is associated with happy or bright melodies compared to non-popular songs.
+
+```{r Gude_Roughcalcs, include = F}
+mean(as.integer(subset(data1960, target==1)$mode)-1)*100
+mean(as.integer(subset(data1960, target==0)$mode)-1)*100
+mean(as.integer(subset(data2000, target==1)$mode)-1)*100
+mean(as.integer(subset(data2000, target==0)$mode)-1)*100
+nrow(subset(data1960, mode==1))/nrow(data1960)
+```
+
+A bar chart of the mode values for just the popular songs from the two decades under review is presented below:
+
+```{r EDA_PopMode_Gude}
+# Produce a two part bar chart for popular songs from both decades
+ggplot(data = dataPopular, aes(mode)) + 
+  geom_bar(aes(fill = year)) +
+  labs(title="Bar Chart of Mode in Popular Songs from the 1960's and 2000's") +
+  labs(x="Mode", y="Count") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_fill_manual(values=c("#000080", "red4")) +
+  theme_minimal()
+```
+
+The percentage of songs that are in the major key from popular 1960's songs (`r mean(as.integer(subset(data1960, target==1)$mode)-1)*100`%) appears to be significantly higher than the percentage of songs that are in the major key from popular 2000's songs (`r mean(as.integer(subset(data2000, target==1)$mode)-1)*100`%).  Additional T-Testing may confirm if the two values can be considered statistically different or not.
+
+### Mode Difference Among Popular Songs Between Decades
+Considering only popular music, the mean mode (equivalent to the percentage of songs with a major key mode) for 1960's music is `r mean(as.integer(subset(data1960, target==1)$mode)-1)`, and the mean key for 2000's music is `r mean(as.integer(subset(data2000, target==1)$mode)-1)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean keys from either decade are statistically equivalent:
+
+```{r mode_TTest_Gude}
+# Perform t-test
+ttest_mode = t.test((as.integer(subset(data1960, target==1)$mode)-1), (as.integer(subset(data2000, target==1)$mode)-1))
+ttest_mode
+```
+
+With a probability value of `r ttest_mode$p.value` (p < 0.025), the T-Test null hypothesis is rejected, and the mean mode values between the 1960's and 2000's decades should **not** be considered equivalent (or their true difference in means is not equal to 0).  The 1960's had a statistically significant greater proportion of popular songs in the major key compared to popular songs in the 2000's.
+
+## An Exploration of Valeance
+
+### Valence Histograms
+Discussed above, the **Valence** describes the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).  Valence is a numerical value between 0 and 1, inclusive.  Distributions of the valence values of `r nrow(data1960)` songs from the 1960's and `r nrow(data2000)` songs from the 2000's are presented below with darker shades showing the distributions of the popular songs within each dataset and the mean value of each set represented by a dashed line:
+
+```{r EDA_Valence_Gude}
+# Set up a conditional for mean lines
+val60Line <- ddply(data1960, "target", summarise, val.mean=mean(valence))
+val00Line <- ddply(data2000, "target", summarise, val.mean=mean(valence))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = data1960, aes(x = valence, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Valence in 1960's Songs") +
+  labs(x="Valence", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#00aaaa", "#000080")) +
+  scale_fill_manual(values=c("#00aaaa", "#000080")) +
+  geom_vline(data= val60Line, aes(xintercept=val.mean, color=target),
+             linetype="dashed")
+
+# Produce a two part graph for popular and non-popular songs from 2000
+ggplot(data = data2000, aes(x = valence, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Valence in 2000's Songs") +
+  labs(x="Valence", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("firebrick2", "red4")) +
+  scale_fill_manual(values=c("firebrick2", "red4")) +
+  geom_vline(data= val00Line, aes(xintercept=val.mean, color=target),
+             linetype="dashed")
+```
+
+From the general trends in the histogram data above, there is a clear right shift in the distribution of valence values (towards more positive and uplifting qualities) for popular songs in the 1960's and 2000's compared to the valence values of non-popular songs, from an average valence of `r mean(subset(data1960, target == 1)$valence)` and `r mean(subset(data2000, target == 1)$valence)` for popular songs in the 1960's and 2000's, respectively, versus `r mean(subset(data1960, target == 0)$valence)` and `r mean(subset(data2000, target == 0)$valence)` for non-popular songs in the 1960's and 2000's, respectively.  In addition, none of the distributions of valence values appear to be normally-distributed.
+
+The distributions of valence values for just the popular songs from the two decades under review are presented below:
+
+```{r EDA_PopValence_Gude}
+# Set up a conditional for mean lines
+valPopLine <- ddply(dataPopular, "year", summarise, val.mean=mean(valence))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = dataPopular, aes(x = valence, fill = year)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Valence in Popular Songs from the 1960's and 2000's") +
+  labs(x="Valence", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#000080", "red4")) +
+  scale_fill_manual(values=c("#000080", "red4")) +
+  geom_vline(data= valPopLine, aes(xintercept=val.mean, color=year),
+             linetype="dashed")
+```
+
+From the general trend in the histogram data above, it can be seen that the valence distribution of popular songs is different between the two decades, with the 1960's trending to higher valence values in comparison to the 2000's distribution.  The mean valence of either decade appears to be distinct as well with the 1960's having a much higher, average valence value in comparison to the 2000's. Additional T-Testing may confirm if the two values can be considered statistically different or not.
+
+### Valence Normality Testing
+The shape of each of the histograms from each decade and popularity do not appear normally-distributed; instead they appear closer to a uniform distribution or triangular in the case of popular 1960's songs and non-popular 2000's songs.  To confirm this observation, the Shapiro-Wilke Test (H<sub>0</sub>: the data is normally-distributed) identifies the following for each sub-category of decade and popularity for valence distributions:
+
+``` {r test_valence_Gude, include=F}
+format(shapiro.test(subset(data1960,target ==1)$valence)$p.value, digits = 4)
+format(shapiro.test(subset(data1960,target ==0)$valence)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==1)$valence)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==0)$valence)$p.value, digits = 4)
+```
+
+**Shapiro-Wilke Normality Test:**
+1960's Popular Probabality Value:       `r format(shapiro.test(subset(data1960,target ==1)$valence)$p.value, digits = 4)`
+1960's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data1960,target ==0)$valence)$p.value, digits = 4)`
+2000's Popular Probabality Value:       `r format(shapiro.test(subset(data2000,target ==1)$valence)$p.value, digits = 4)`
+2000's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data2000,target ==0)$valence)$p.value, digits = 4)`
+
+For all of the categories above, the Shapiro-Wilke probability was significantly less than 0.05 and, thus, none of the valence distributions should be considered normally-distributed.
+
+### Valence Difference Among Popular Songs Between Decades
+Considering only popular music, the mean valence for 1960's music is `r format(mean(subset(data1960, target == 1)$valence), digits = 3)`, and the mean valence for 2000's music is `r format(mean(subset(data2000, target == 1)$valence), digits = 3)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean valence values from either decade are statistically equivalent:
+
+```{r valence_TTest_Gude}
+# Perform t-test
+ttest_val = t.test(subset(data1960,target ==1)$valence, subset(data2000,target ==1)$valence)
+ttest_val
+```
+
+With a probability value of `r ttest_val$p.value` (p < 0.025), the T-Test null hypothesis is rejected, and the mean valence values between the 1960's and 2000's decades should **not** be considered equivalent (or their true difference in means is not equal to 0).  The 1960's had a statistically-significant greater average valence value among popular songs compared to popular songs in the 2000's.
+
+## An Exploration of Danceability
+
+### Danceability Histograms
+Discussed above, the **Danceability** describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.  Danceability is a numerical value between 0 and 1, inclusive.  Distributions of the danceability values of `r nrow(data1960)` songs from the 1960's and `r nrow(data2000)` songs from the 2000's are presented below with darker shades showing the distributions of the popular songs within each dataset and the mean value of each set represented by a dashed line:
+
+```{r EDA_Danceability_Gude}
+# Set up a conditional for mean lines
+danc60Line <- ddply(data1960, "target", summarise, danc.mean=mean(danceability))
+danc00Line <- ddply(data2000, "target", summarise, danc.mean=mean(danceability))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = data1960, aes(x = danceability, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Danceability in 1960's Songs") +
+  labs(x="Danceability", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#00aaaa", "#000080")) +
+  scale_fill_manual(values=c("#00aaaa", "#000080")) +
+  geom_vline(data= danc60Line, aes(xintercept=danc.mean, color=target),
+             linetype="dashed")
+
+# Produce a two part graph for popular and non-popular songs from 2000
+ggplot(data = data2000, aes(x = danceability, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Danceability in 2000's Songs") +
+  labs(x="Danceability", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("firebrick2", "red4")) +
+  scale_fill_manual(values=c("firebrick2", "red4")) +
+  geom_vline(data= danc00Line, aes(xintercept=danc.mean, color=target),
+             linetype="dashed")
+```
+
+From the general trends in the histogram data above, there is a clear right shift in the distribution of danceability values (towards more positive and uplifting qualities) for popular songs in the 1960's and 2000's compared to the danceability values of non-popular songs, from an average danceability of `r mean(subset(data1960, target == 1)$danceability)` and `r mean(subset(data2000, target == 1)$danceability)` for popular songs in the 1960's and 2000's, respectively, versus `r mean(subset(data1960, target == 0)$danceability)` and `r mean(subset(data2000, target == 0)$danceability)` for non-popular songs in the 1960's and 2000's, respectively.  In addition, all of the distributions of danceability values appear to be normally-distributed.
+
+The distributions of danceability values for just the popular songs from the two decades under review are presented below:
+
+```{r EDA_PopDanceability_Gude}
+# Set up a conditional for mean lines
+dancPopLine <- ddply(dataPopular, "year", summarise, danc.mean=mean(danceability))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = dataPopular, aes(x = danceability, fill = year)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Danceability in Popular Songs from the 1960's and 2000's") +
+  labs(x="Danceability", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#000080", "red4")) +
+  scale_fill_manual(values=c("#000080", "red4")) +
+  geom_vline(data= dancPopLine, aes(xintercept=danc.mean, color=year),
+             linetype="dashed")
+```
+
+From the general trend in the histogram data above, it can be seen that the danceability distribution of popular songs is different between the two decades, with the 2000's trending to higher danceability values in comparison to the 1960's distribution.  The mean danceability of either decade appears to be distinct as well with the 2000's having a much higher, average danceability value in comparison to the 1960's. Additional T-Testing may confirm if the two values can be considered statistically different or not.
+
+### Danceability Normality Testing
+The shape of each of the histograms from each decade and popularity appear to be normally-distributed.  To confirm this observation, the Shapiro-Wilke Test (H<sub>0</sub>: the data is normally-distributed) identifies the following for each sub-category of decade and popularity for danceability distributions:
+
+``` {r test_danceability_Gude, include=F}
+format(shapiro.test(subset(data1960,target ==1)$danceability)$p.value, digits = 4)
+format(shapiro.test(subset(data1960,target ==0)$danceability)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==1)$danceability)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==0)$danceability)$p.value, digits = 4)
+```
+
+**Shapiro-Wilke Normality Test:**
+1960's Popular Probabality Value:       `r format(shapiro.test(subset(data1960,target ==1)$danceability)$p.value, digits = 4)`
+1960's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data1960,target ==0)$danceability)$p.value, digits = 4)`
+2000's Popular Probabality Value:       `r format(shapiro.test(subset(data2000,target ==1)$danceability)$p.value, digits = 4)`
+2000's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data2000,target ==0)$danceability)$p.value, digits = 4)`
+
+For all of the categories above, the Shapiro-Wilke probability was significantly less than 0.05 and, thus in contrast to potential appearances, none of the danceability distributions should be considered normally-distributed.
+
+### Danceability Difference Among Popular Songs Between Decades
+Considering only popular music, the mean danceability for 1960's music is `r format(mean(subset(data1960, target == 1)$danceability), digits = 3)`, and the mean danceability for 2000's music is `r format(mean(subset(data2000, target == 1)$danceability), digits = 3)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean danceability values from either decade are statistically equivalent:
+
+```{r danceability_TTest_Gude}
+# Perform t-test
+ttest_danc = t.test(subset(data1960,target ==1)$danceability, subset(data2000,target ==1)$danceability)
+ttest_danc
+```
+
+With a probability value of `r ttest_danc$p.value` (p < 0.025), the T-Test null hypothesis is rejected, and the mean danceability values between the 1960's and 2000's decades should **not** be considered equivalent (or their true difference in means is not equal to 0).  The 2000's had a statistically-significant greater average danceability value among popular songs compared to popular songs in the 1960's.
+
+## An Exploration of Energy
+
+### Energy Histograms
+Discussed above, **Energy** represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.  Danceability is a numerical value between 0 and 1, inclusive.  Distributions of the energy values of `r nrow(data1960)` songs from the 1960's and `r nrow(data2000)` songs from the 2000's are presented below with darker shades showing the distributions of the popular songs within each dataset and the mean value of each set represented by a dashed line:
+
+```{r EDA_Energy_Gude}
+# Set up a conditional for mean lines
+energy60Line <- ddply(data1960, "target", summarise, energy.mean=mean(energy))
+energy00Line <- ddply(data2000, "target", summarise, energy.mean=mean(energy))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = data1960, aes(x = energy, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Energy in 1960's Songs") +
+  labs(x="Energy", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#00aaaa", "#000080")) +
+  scale_fill_manual(values=c("#00aaaa", "#000080")) +
+  geom_vline(data= energy60Line, aes(xintercept=energy.mean, color=target),
+             linetype="dashed")
+
+# Produce a two part graph for popular and non-popular songs from 2000
+ggplot(data = data2000, aes(x = energy, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Energy in 2000's Songs") +
+  labs(x="Energy", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("firebrick2", "red4")) +
+  scale_fill_manual(values=c("firebrick2", "red4")) +
+  geom_vline(data= energy00Line, aes(xintercept=energy.mean, color=target),
+             linetype="dashed")
+```
+
+From the general trends in the histogram data above, there is a clear right shift in the distribution of energy values for popular songs in the 1960's and 2000's compared to the energy values of non-popular songs, from an average energy of `r mean(subset(data1960, target == 1)$energy)` and `r mean(subset(data2000, target == 1)$energy)` for popular songs in the 1960's and 2000's, respectively, versus `r mean(subset(data1960, target == 0)$energy)` and `r mean(subset(data2000, target == 0)$energy)` for non-popular songs in the 1960's and 2000's, respectively.  In addition, none of the distributions of energy values appear to be normally-distributed, with significant skews in the distribution either to the left or right in each of the distributions except popular 1960's songs which still has two many energy values near the tails of the distribution to be considered normally-distributed.
+
+The distributions of energy values for just the popular songs from the two decades under review are presented below:
+
+```{r EDA_PopEnergy_Gude}
+# Set up a conditional for mean lines
+energyPopLine <- ddply(dataPopular, "year", summarise, energy.mean=mean(energy))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = dataPopular, aes(x = energy, fill = year)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Energy in Popular Songs from the 1960's and 2000's") +
+  labs(x="Energy", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#000080", "red4")) +
+  scale_fill_manual(values=c("#000080", "red4")) +
+  geom_vline(data= energyPopLine, aes(xintercept=energy.mean, color=year),
+             linetype="dashed")
+```
+
+From the general trend in the histogram data above, it can be seen that the energy distribution of popular songs is different between the two decades, with the 2000's trending to higher energy values in comparison to the 1960's distribution.  The mean energy of either decade appears to be distinct as well with the 2000's having a much higher, average energy value in comparison to the 1960's. Additional T-Testing may confirm if the two values can be considered statistically different or not.
+
+### Energy Normality Testing
+The shape of each of the histograms from each decade and popularity do not appear to be normally-distributed.  To confirm this observation, the Shapiro-Wilke Test (H<sub>0</sub>: the data is normally-distributed) identifies the following for each sub-category of decade and popularity for energy distributions:
+
+``` {r test_energy_Gude, include=F}
+format(shapiro.test(subset(data1960,target ==1)$energy)$p.value, digits = 4)
+format(shapiro.test(subset(data1960,target ==0)$energy)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==1)$energy)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==0)$energy)$p.value, digits = 4)
+```
+
+**Shapiro-Wilke Normality Test:**
+1960's Popular Probabality Value:       `r format(shapiro.test(subset(data1960,target ==1)$energy)$p.value, digits = 4)`
+1960's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data1960,target ==0)$energy)$p.value, digits = 4)`
+2000's Popular Probabality Value:       `r format(shapiro.test(subset(data2000,target ==1)$energy)$p.value, digits = 4)`
+2000's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data2000,target ==0)$energy)$p.value, digits = 4)`
+
+For all of the categories above, the Shapiro-Wilke probability was significantly less than 0.05 and, thus, none of the energy distributions should be considered normally-distributed.
+
+### Energy Difference Among Popular Songs Between Decades
+Considering only popular music, the mean energy for 1960's music is `r format(mean(subset(data1960, target == 1)$energy), digits = 3)`, and the mean energy for 2000's music is `r format(mean(subset(data2000, target == 1)$energy), digits = 3)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean energy values from either decade are statistically equivalent:
+
+```{r energy_TTest_Gude}
+# Perform t-test
+ttest_energy = t.test(subset(data1960,target ==1)$energy, subset(data2000,target ==1)$energy)
+ttest_energy
+```
+
+With a probability value of `r ttest_energy$p.value` (p < 0.025), the T-Test null hypothesis is rejected, and the mean energy values between the 1960's and 2000's decades should **not** be considered equivalent (or their true difference in means is not equal to 0).  The 2000's had a statistically-significant greater average energy value among popular songs compared to popular songs in the 1960's.
+
+## An Exploration of Liveness
+
+### Liveness Histograms
+Discussed above, **Liveness** detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live.  Liveness is a numerical value between 0 and 1, inclusive.  Distributions of the liveness values of `r nrow(data1960)` songs from the 1960's and `r nrow(data2000)` songs from the 2000's are presented below with darker shades showing the distributions of the popular songs within each dataset and the mean value of each set represented by a dashed line:
+
+```{r EDA_Liveness_Gude}
+# Set up a conditional for mean lines
+live60Line <- ddply(data1960, "target", summarise, live.mean=mean(liveness))
+live00Line <- ddply(data2000, "target", summarise, live.mean=mean(liveness))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = data1960, aes(x = liveness, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Liveness in 1960's Songs") +
+  labs(x="Liveness", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#00aaaa", "#000080")) +
+  scale_fill_manual(values=c("#00aaaa", "#000080")) +
+  geom_vline(data= live60Line, aes(xintercept=live.mean, color=target),
+             linetype="dashed")
+
+# Produce a two part graph for popular and non-popular songs from 2000
+ggplot(data = data2000, aes(x = liveness, fill = target)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Liveness in 2000's Songs") +
+  labs(x="Liveness", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("firebrick2", "red4")) +
+  scale_fill_manual(values=c("firebrick2", "red4")) +
+  geom_vline(data= live00Line, aes(xintercept=live.mean, color=target),
+             linetype="dashed")
+```
+
+From the general trends in the histogram data above, there is a clear and pronounced left shift in all the distributions of liveness values, potentially identifying a general preference for studio-produced music qualities in producers or listeners.  It can be seen that the liveness for popular songs in 1960 skews higher than for non-popular songs, from an average liveness of `r mean(subset(data1960, target == 1)$liveness)` for popular songs versus `r mean(subset(data1960, target == 0)$liveness)` for non-popular songs.  Whereas the reverse is true for popular songs in the 2000's - the liveness for popular songs in 2000 skews lower than for non-popular songs, from an average liveness of `r mean(subset(data2000, target == 1)$liveness)` for popular songs versus `r mean(subset(data2000, target == 0)$liveness)` for non-popular songs.
+
+The distributions of liveness values for just the popular songs from the two decades under review are presented below:
+
+```{r EDA_PopLiveness_Gude}
+# Set up a conditional for mean lines
+livePopLine <- ddply(dataPopular, "year", summarise, live.mean=mean(liveness))
+
+# Produce a two part graph for popular and non-popular songs from 1960
+ggplot(data = dataPopular, aes(x = liveness, fill = year)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title="Histogram for Liveness in Popular Songs from the 1960's and 2000's") +
+  labs(x="Liveness", y="Frequency") + 
+  theme(legend.position=c(0.9, 0.8)) +
+  scale_color_manual(values=c("#000080", "red4")) +
+  scale_fill_manual(values=c("#000080", "red4")) +
+  geom_vline(data= livePopLine, aes(xintercept=live.mean, color=year),
+             linetype="dashed")
+```
+
+From the general trend in the histogram data above, it can be seen that the liveness distribution of popular songs is different between the two decades, with the 1960's trending to higher liveness values in comparison to the 2000's distribution.  The mean liveness of either decade appears to be distinct as well with the 1960's having a higher average liveness value in comparison to the 2000's. Additional T-Testing may confirm if the two values can be considered statistically different or not.
+
+### Liveness Normality Testing
+The shape of each of the histograms from each decade and popularity do not appear to be normally-distributed.  To confirm this observation, the Shapiro-Wilke Test (H<sub>0</sub>: the data is normally-distributed) identifies the following for each sub-category of decade and popularity for liveness distributions:
+
+``` {r test_liveness_Gude, include=F}
+format(shapiro.test(subset(data1960,target ==1)$liveness)$p.value, digits = 4)
+format(shapiro.test(subset(data1960,target ==0)$liveness)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==1)$liveness)$p.value, digits = 4)
+format(shapiro.test(subset(data2000,target ==0)$liveness)$p.value, digits = 4)
+```
+
+**Shapiro-Wilke Normality Test:**
+1960's Popular Probabality Value:       `r format(shapiro.test(subset(data1960,target ==1)$liveness)$p.value, digits = 4)`
+1960's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data1960,target ==0)$liveness)$p.value, digits = 4)`
+2000's Popular Probabality Value:       `r format(shapiro.test(subset(data2000,target ==1)$liveness)$p.value, digits = 4)`
+2000's Non-Popular Probabality Value:   `r format(shapiro.test(subset(data2000,target ==0)$liveness)$p.value, digits = 4)`
+
+For all of the categories above, the Shapiro-Wilke probability was significantly less than 0.05 and, thus, none of the liveness distributions should be considered normally-distributed.
+
+### Liveness Difference Among Popular Songs Between Decades
+Considering only popular music, the mean liveness for 1960's music is `r format(mean(subset(data1960, target == 1)$liveness), digits = 3)`, and the mean liveness for 2000's music is `r format(mean(subset(data2000, target == 1)$liveness), digits = 3)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean liveness values from either decade are statistically equivalent:
+
+```{r liveness_TTest_Gude}
+# Perform t-test
+ttest_liveness = t.test(subset(data1960,target ==1)$liveness, subset(data2000,target ==1)$liveness)
+ttest_liveness
+```
+
+With a probability value of `r ttest_liveness$p.value` (p < 0.025), the T-Test null hypothesis is rejected, and the mean liveness values between the 1960's and 2000's decades should **not** be considered equivalent (or their true difference in means is not equal to 0).  The 1960's had a statistically-significant greater average liveness value among popular songs compared to popular songs in the 2000's.
 
 # K-Nearest Neighbor - Juhne
 (For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
@@ -210,11 +831,6 @@ Suggestion: For KNN, use 'target' variable as the dependent variable.  Potential
 (For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
 
 (Linear Regression but with non-linear modeling - our target is binary so this is good)
-
-# Feature Selection/Model selection - Krystal
-(For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
-
-Suggestion: Include an analysis and discussion of why certain variables are best (find and discuss computing time for instance)
 
 # Summary of Results
 
