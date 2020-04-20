@@ -178,7 +178,7 @@ This study will examine the change in music metrics affecting popularity with re
 
 A summary of the variables and their values from the entire 2000's and 1960's datasets are presented below:
 
-``` {r DataSummary}
+``` {r DataSummary1}
 # Provide a summary of the columns and data within the data
 print('A Summary of the 2000\'s Dataset:')
 summary(data2000)
@@ -191,7 +191,7 @@ summary(data1960)
 
 The purpose of this study is to identify any link or lackthereof between the popularity of a song and seven other factors, tempo, key, mode, valence, danceability, energy, and liveness, based on track metric data computed from Spotify.  A cursory review of the song feature values for just popular between the two decades shows a difference in the mean values for multiple song features.  From the 1960's to the early 2000's, the mean valence noticeably decreases while the mean danceability and energy values noticeably increase.
 
-``` {r DataSummary}
+``` {r DataSummary2}
 # Provide a summary of the columns and data within the data
 print('A Summary of the Popular 2000\'s Tracks:')
 summary(subset(data2000, target == 1))
@@ -200,11 +200,310 @@ print('A Summary of the Popular 1960\'s Tracks:')
 summary(subset(data1960, target == 1))
 ```
 
-
 # K-Nearest Neighbor - Juhne
-(For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
 
-Suggestion: For KNN, use 'target' variable as the dependent variable.  Potentially try different combinations of the features above to improve the accuracy (a feature-selection-like anaylsis).
+The project goal is to explore which features determine whether a song is popular or not. K-Nearest Neighbor is a good option to apply on this dataset. Since K-Nearest Neighbor algorithms use distance function to measure distance among each data point, make sure that every predictor has same unit is very important. 
+
+From the previous EDA section it showed that **tempo, key and mode** have much greater mean with other predictors. Therefore, in order to make the most accuary K-Nearest Neighbor model scale the data using Z-score is necessary.
+
+On the other hand, since the K-Nearest Neighbor algorithm highly depend on distance function. Cleaning the categorical features like **track and artist** is also very important.
+ 
+From the scaled dataset, notice that **tempo** for 2000 data is smaller than 1960 data in unit factor, the **mode and valence** value range for 2000 data are more spread than 1960 data showing that musice in 2000 have more varieties than music in 1960. However, the 2000s' musics are in general have more **energy** than 1960's musics. 
+
+## K-Nearest Neighbor Scaling
+
+### scale (data 2000)
+
+```{r scale-data-junhe-20}
+# scale tempo ~ liveness
+df.scaled.20 <- as.data.frame(scale(data2000[3:9], center = TRUE, scale = TRUE))
+# factor strings
+# df.scaled.20$track <- as.factor(data2000$track)
+# df.scaled.20$artist <- as.factor(data2000$artist)
+df.scaled.20$target <- as.factor(data2000$target)
+
+summary(df.scaled.20)
+```
+
+### scale (data 1960)
+
+```{r scale-data-junhe-60}
+# scale tempo ~ liveness
+df.scaled.60 <- as.data.frame(scale(data1960[3:9], center = TRUE, scale = TRUE))
+# factor strings
+# df.scaled.20$track <- as.factor(data2000$track)
+# df.scaled.20$artist <- as.factor(data2000$artist)
+df.scaled.60$target <- as.factor(data1960$target)
+
+summary(df.scaled.60)
+```
+
+## K-Nearest Neighbor Correlation Matrix
+
+### KNN-correlation matrix of (data 2000)
+
+Before building KNN model, in order to preventing high collinearity between each predictor, it is also necessary to check th correlation between each predictors. From the correlation matrix for 2000s dataset and 1960s dataset, all predictors are not highly related to each other.  
+
+```{r KNN-correlation-junhe-20}
+loadPkg('psych')
+#pairs(df.scaled.20)
+pairs.panels(data2000, 
+             method = "pearson", # correlation method
+             hist.col = "#00AFBB", # set histogram color, can use "#22AFBB", "red",
+             density = TRUE,  # show density plots
+             ellipses = TRUE # show correlation ellipses
+             )
+
+```
+
+### KNN-correlation matrix of (data 1960)
+
+```{r KNN-correlation-junhe-60}
+
+#pairs(df.scaled.60)
+pairs.panels(data1960, 
+             method = "pearson", # correlation method
+             hist.col = "#00AFBB", # set histogram color, can use "#22AFBB", "red",
+             density = TRUE,  # show density plots
+             ellipses = TRUE # show correlation ellipses
+             )
+#unloadPkg('psych')
+```
+
+## K-Nearest Neighbor Spliting data into train test subsets
+
+### KNN split data into train test subsets (data 2000)
+
+Since datas are very precious, it is always a good idea to split the original dataset into train and test subsets. Use training data set to fit KNN model and use test dataset to test the accuracy our the model is the best way to utilize the dataset. Split the original data into 4:1 train and test subset.
+
+```{r train-test-junhe-20}
+# split data into train test subset, ratio 4:1, seed 42
+seed <- 42
+## set the seed to make the partition reproducible
+set.seed(seed)
+## 80% of the sample size
+smp_size <- floor(0.80 * nrow(data2000))
+# scale tempo ~ liveness
+# df.scaled.20 <- as.data.frame(scale(data2000[3:9], center = TRUE, scale = TRUE))
+# df.scaled.20$target <- as.factor(data2000$target)
+summary(df.scaled.20)
+
+dat20_sample <- sample(2, nrow(df.scaled.20), replace=TRUE, prob=c(0.80, 0.20))
+
+```
+
+### KNN split data into train test subsets (data 1960)
+
+```{r train-test-junhe-60}
+# split data into train test subset, ratio 4:1, seed 42
+seed <- 42
+## set the seed to make the partition reproducible
+set.seed(seed)
+## 80% of the sample size
+smp_size <- floor(0.80 * nrow(data1960))
+# scale tempo ~ liveness
+# df.scaled.20 <- as.data.frame(scale(data2000[3:9], center = TRUE, scale = TRUE))
+# df.scaled.20$target <- as.factor(data2000$target)
+summary(df.scaled.60)
+
+dat60_sample <- sample(2, nrow(df.scaled.60), replace=TRUE, prob=c(0.80, 0.20))
+
+```
+
+## K-Nearest Neighbor Seperate target variable
+
+### KNN seperate target variable y and predictors X (data 2000)
+
+In order to test accuracy of the fitted models, spliting target variable **target** (1 stands for popular, 0 stands for not popular) variable from the predictors is also necessary.
+
+```{r y-X-junhe-20}
+train.X.20 <- df.scaled.20[dat20_sample==1, 1:7]
+train.y.20 <- df.scaled.20[dat20_sample==1, 8]
+test.X.20 <- df.scaled.20[dat20_sample==2, 1:7]
+test.y.20 <- df.scaled.20[dat20_sample==2, 8]
+#dim(test.X.20)[1]/dim(df.scaled.20)[1]
+summary(test.X.20)
+dim(train.X.20)
+```
+
+### KNN seperate target variable y and predictors X (data 1960)
+
+```{r y-X-junhe-60}
+train.X.60 <- df.scaled.60[dat60_sample==1, 1:7]
+train.y.60 <- df.scaled.60[dat60_sample==1, 8]
+test.X.60 <- df.scaled.60[dat60_sample==2, 1:7]
+test.y.60 <- df.scaled.60[dat60_sample==2, 8]
+#dim(test.X.60)[1]/dim(df.scaled.60)[1]
+summary(test.X.60)
+dim(train.X.60)
+```
+
+## K-Nearest Neighbor helper function to choose best k value
+
+This helper function apply K-Nearest Neighbor model function from **class** library, then build confusion matrix using the predicted target value with the test target value. Finally, using the formula **TP/(TP+NP)** to calculate accuracy of the fitted KNN model with given K value. 
+
+Accuracy is a very important factor to determine the goodness of a fitted KNN model. On the other hand, because of high k-value indicates high precision and high cost on computation, carefully determine the appropriate k-value in order to manage best the trade-off between precision and computation cost is very important. In other word, using the exhaust approach to test a series of k-values and find the most appropriate k-value is the best way to do.
+
+```{r checkK-helper-junhe}
+# load class package for knn
+loadPkg('class')
+# function to selection best k #
+chooseK = function(k, train_set, val_set, train_class, val_class){
+  
+  # Build knn with k neighbors considered.
+  set.seed(1)
+  class_knn = knn(train = train_set,    #<- training set cases
+                  test = val_set,       #<- test set cases
+                  cl = train_class,     #<- category for classification
+                  k = k) #,                #<- number of neighbors considered
+                  # use.all = TRUE)       #<- control ties between class assignments
+                                        #   If true, all distances equal to the kth 
+                                        #   largest are included
+  
+  tab = table(class_knn, val_class)
+  
+  # Calculate the accuracy.
+  accu = sum(tab[row(tab) == col(tab)]) / sum(tab)                         
+  cbind(k = k, accuracy = accu)
+}
+```
+
+## K-Nearest Neighbor helper function to selection best combination of features with highest accuracy
+
+In order to build the best KNN model with the given datasets to predict whether a music is popular or not. It is necessary to use exhaust approach to build model with all combinations of predictors and decide which combination of predictors can generate the most accurate model.
+
+The **featureSelectionKNN** helper function applies **combn** function which helps generate a list of **n Choose i**, where n stands for number of predictors, i stands for number of predictors we want to consider in each iteration from i to n. Within each iteration, apply **chooseK** function to determine the best k-value for this combination of predictors. Then store the model with the highest accuracy into the result dataframe.
+
+The time complexity for this algorithm is **[(7 Choose 1) times (21-3) times O(knn_function)] +...+ [(7 Choose 7) times (21-3) times O(knn_function)]**. Iterating from **7 Choose 1 to 7 Choose 7**
+
+```{r featureSelection-junhe}
+#features <- combn(names(train.X.20),3)
+#features[,1]
+#head(train.X.20[,features[,1]])
+featureSelectionKNN <- function(train.X, test.X, train.y, test.y){
+  res <- data.frame(k = 0, accuracy = 0, features = '')
+  for(i in 3:dim(train.X)[2]-1){
+    features <- combn(names(train.X),i)
+    for(j in 3:dim(features)[2]-1){
+      knn_different_k = sapply(seq(3, 21, by = 2),  #<- set k to be odd number from 3 to 21
+                         function(x) chooseK(x, 
+                                             train_set = train.X[,features[,j]],
+                                             val_set = test.X[,features[,j]],
+                                             train_class = train.y,
+                                             val_class = test.y))
+      
+      knn_different_k = data.frame(k = knn_different_k[1,],
+                             accuracy = knn_different_k[2,])
+      
+      new.df = data.frame(k = knn_different_k[order(-knn_different_k$accuracy),][1,1],
+                          accuracy = knn_different_k[order(-knn_different_k$accuracy),][1,2],
+                          features = paste(features[,j],collapse=" ")
+                          )
+      res = rbind(res, new.df)
+    }
+    #print(dim(features)[2])
+  }
+  res
+}
+
+```
+
+## KNN feature selection (data 2000)
+
+```{r feature-selection-junhe-20}
+features.20 = featureSelectionKNN(train.X.20, test.X.20, train.y.20, test.y.20)
+# head(test[order(-test$accuracy),])
+f.20 <- data.frame(features.20[order(-features.20$accuracy),3])
+head(f.20)
+```
+
+From the above result, the best KNN model for 2000s data after feature selection has accuracy equal to 0.75 with k-value equal 15 and 5 features which are **tempo, valence, danceability, energy and liveness**.
+
+The alternative option is the second best KNN model with accuracy equal to 0.75 as same as the best model but with lower k-value which equals 13, and 6 instead of 5 features which are **tempo, mode, valence, danceability, energy and liveness**. However, high k-value can cause expensive computation cost and second best KNN model seems to be better than the best KNN model in the list, we want to minimize the number of involved predictors to be able to explore the most important factors that decide whether a music is popular or not in 2000s.
+
+## KNN feature selection (data 1960)
+
+```{r feature-selection-junhe-60}
+features.60 = featureSelectionKNN(train.X.60, test.X.60, train.y.60, test.y.60)
+# head(test[order(-test$accuracy),])
+f.60 <- data.frame(features.60[order(-features.60$accuracy),3])
+f.60
+```
+
+From the above result, the best KNN model for 1960s data after feature selection has accuracy equal to 0.68 with k-value equal 19 and only 4 features which are **mode, valence, energy and liveness**.
+
+The alternative option is the second best KNN model with accuracy equal to 0.68 as same as the best model but with higher k-value which equals 21, and 5 instead of 4 features which are **key, mode, valence, danceability, energy**. This time the second best KNN model loses on both k-value and number of predictors. So, we choose the best model without doubt as our final KNN model for 1960s dataset.
+
+In conclusion, comparing the best model for 1960s dataset and 2000s dataset, the important features to determine whether a music is popular has changed from **mode, valence, energy and liveness** in 1960s to **tempo, valence, danceability, energy and liveness** in 2000s. In other word, people in 1960s took **mode, valence, energy and liveness** these four music elements as the most important feature to determine whether a music is good or not, and has changed in 2000s to **tempo, valence, danceability, energy and liveness** these five music elements. People still think **valence, energy and liveness** are important factors but no longer took **mode** as an important factor. Moreover, took **tempo and danceability** as two new important factors.
+
+##Visualize k-values in the best KNN model (data 2000)
+
+Build the KNN model using 2000s dataset with the best subset of features and check correctness our above **featureSelectionKNN** result. Notice that the best k-value among 1 through 81 is still 15 which is as same as the result we get from **featureSelectionKNN** function. On the other hand, k-value equal 15 is also the ankle value of the k-values series which is the best k-value we are looking for.
+
+```{r KNN-junhe-20}
+# features selected by features selection function, with the best accuracy
+best_features.20 <- c('tempo', 'valence', 'danceability', 'energy', 'liveness')
+
+knn_different_k = sapply(seq(1, 81, by = 2),  #<- set k to be odd number from 1 to 21
+                         function(x) chooseK(x, 
+                                             train_set = train.X.20[,best_features.20],
+                                             val_set = test.X.20[,best_features.20],
+                                             train_class = train.y.20,
+                                             val_class = test.y.20))
+
+# Reformat the results to graph the results.
+#str(knn_different_k)
+knn_different_k = data.frame(k = knn_different_k[1,],
+                             accuracy = knn_different_k[2,])
+
+# Plot accuracy vs. k.
+# install.packages("ggplot2")
+loadPkg('ggplot2')
+
+ggplot(knn_different_k,
+       aes(x = k, y = accuracy)) +
+  geom_line(color = "orange", size = 1.5) +
+  geom_point(size = 3)
+#summary(pima$type)[2]/dim(pima)[1]
+#head(knn_different_k[order(knn_different_k$accuracy),])
+#as.data.frame(knn_different_k[order(-knn_different_k$accuracy),])[1,2]
+```
+
+##Visualize k-value trend in the best KNN model (data 1960)
+
+Build the KNN model using 1960s dataset with the best subset of features and check correctness our above **featureSelectionKNN** result. Notice that the best k-value among 1 through 81 is still 19 which is as same as the result we get from **featureSelectionKNN** function. On the other hand, k-value equal 19 is also the ankle value of the k-values series which is the best k-value we are looking for.
+
+The correctness of all the results has now been proved
+
+```{r KNN-junhe-60}
+# features selected by features selection function, with the best accuracy
+best_features.60 <- c('mode', 'valence', 'energy', 'liveness')
+
+knn_different_k = sapply(seq(1, 81, by = 2),  #<- set k to be odd number from 1 to 21
+                         function(x) chooseK(x, 
+                                             train_set = train.X.60[,best_features.60],
+                                             val_set = test.X.60[,best_features.60],
+                                             train_class = train.y.60,
+                                             val_class = test.y.60))
+
+# Reformat the results to graph the results.
+#str(knn_different_k)
+knn_different_k = data.frame(k = knn_different_k[1,],
+                             accuracy = knn_different_k[2,])
+
+# Plot accuracy vs. k.
+# install.packages("ggplot2")
+loadPkg('ggplot2')
+
+ggplot(knn_different_k,
+       aes(x = k, y = accuracy)) +
+  geom_line(color = "orange", size = 1.5) +
+  geom_point(size = 3)
+#summary(pima$type)[2]/dim(pima)[1]
+#head(knn_different_k[order(knn_different_k$accuracy),])
+#as.data.frame(knn_different_k[order(-knn_different_k$accuracy),])[1,2]
+```
+
 
 # Logit Regression - Siwei
 (For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
