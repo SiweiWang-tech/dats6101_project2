@@ -93,12 +93,11 @@ outlierKD2 <- function(df, var, rm=FALSE) {
         return(invisible(df))
     }
 }
-
 ```
 
 # Executive Summary:
 
-
+The purpose of this study it to identify: Does the key, valence, tempo, or other musical attributes change between popular American songs, and not popular songs for contrast, from the 1960's versus songs from the early 2000's?  Musical attributes under consideration are gathered from the Spotify Audio Analysis tool that records basic musical metrics, such as tempo, key, and mode, as well as more advanced, proprietary metrics, such as energy, valence, and danceability.  Popular songs from each decade are identified as those that have appeared on the Billboard Hot 100, published by Billboard magazine.  This study utilizes three predictive models, K-Nearest Neighbor, Decision Tree, and Logistic Regression, to predict the binary "popularity" feature, popular or not popular.  If each model has greater than 50% accuracy (signifying it is superior to random guessing), then it can be determined that musical attributes *do* have an effect on song popularity, and the features that appear in each model are those that have the most significant impact.
 
 # Purpose:
 
@@ -152,8 +151,6 @@ loadPkg('plyr')
 data1960 <- subset(data.frame(read_csv('dataset-of-60s.csv')), select = c('track', 'artist', 'tempo', 'key', 'mode', 'valence', 'danceability', 'energy', 'liveness', 'target'))
 data2000 <- subset(data.frame(read_csv('dataset-of-00s.csv')), select = c('track', 'artist', 'tempo', 'key', 'mode', 'valence', 'danceability', 'energy', 'liveness', 'target'))
 # Change certain columns to factors as necessary
-data1960$mode <- as.factor(data1960$mode)
-data2000$mode <- as.factor(data2000$mode)
 data1960$target <- as.factor(data1960$target)
 data2000$target <- as.factor(data2000$target)
 
@@ -184,6 +181,12 @@ The final feature, **Target**, was computed from the collective data from Billbo
 This study will examine the change in music metrics affecting popularity with respect to time.  For this purpose, this study will analyze two datasets, one with songs released during the 1960s, containing `r nrow(data1960)` songs, and the other with songs released from the 2000s, containing `r nrow(data2000)` songs.  Each dataset is composed of an equal number of popular and not popular songs, `r nrow(subset(data2000,target == 1))` popular and not popular songs from the 2000s and `r nrow(subset(data1960,target == 1))` popular and not popular songs from the 1960s.  For every song that appears in the Billboard Hot 100 list from their respective decade (with a target value of 1), another song from the same decade, not appearing in the Hot 100 was chosen to fill in the dataset for analytics and review.  Non-popular songs that were chosen from American-produced songs at random from across music genres with the attempt to capture a suitable mix of music qualities.
 
 A summary of the track musical features and their values from the entire 2000's and 1960's datasets are presented below:
+
+```{r xkablesummary_KP, include=F}
+#loadPkg('Rtools')
+loadPkg('xtable')
+loadPkg('kableExtra')
+loadPkg('stringi')
 
 xkabledply = function(smmry, title='Caption', pos='left') { 
   smmry %>%
@@ -230,11 +233,11 @@ print('A Summary of the 2000\'s Dataset:')
 xkablesummary(data2000_X)
 ```
 
-# Variable Anaylsis and Approach - Krystal
+# Variable Anaylsis and Approach - Rich
 
 The purpose of this study is to identify any link or lackthereof between the popularity of a song and seven other factors, tempo, key, mode, valence, danceability, energy, and liveness, based on track metric data computed from Spotify.  For the two decades under review, 1960 and 2000, this study will quantify the specific differences in musical factors between popular and not-popular songs from each decade as well as between popular songs between the decades via three models: **K-Nearest Neighbor**, **Random Forest**, and **Logistic Regression**.  For each model, the accuracy of the model in predicting the popularity of song from its musical factors will be assessed and the principal musical features from the model with the highest accuracy will be compared between popular and non-popular songs within and between decades.
 
-# Exploratory Data Analysis - Krystal
+# Exploratory Data Analysis - Rich
 
 A cursory review of the song feature values for just popular between the two decades, shown below, shows a difference in the mean values for multiple song features, for instance: From the 1960's to the early 2000's, the mean valence noticeably decreases while the mean danceability and energy values noticeably increase.
 
@@ -470,13 +473,13 @@ ggplot(data = data2000, aes(mode)) +
   theme_minimal()
 ```
 
-The percentage of popular songs from the 1960's with a major key (mode = 1) is `r mean(as.integer(subset(data1960, target==1)$mode)-1)*100`%, which is greater than the percentage of non-popular songs from the 1960's with a major key at `r mean(as.integer(subset(data1960, target==0)$mode)-1)*100`%.  Similarly, the percentage of popular songs from the 2000's with a major key (`r mean(as.integer(subset(data2000, target==1)$mode)-1)*100`%) is greater than the percentage of non-popular songs with a major key (`r mean(as.integer(subset(data2000, target==0)$mode)-1)*100`%).  These trends show a general shift in popular songs towards the major key which is associated with happy or bright melodies compared to non-popular songs.
+The percentage of popular songs from the 1960's with a major key (mode = 1) is `r mean(subset(data1960, target==1)$mode)*100`%, which is greater than the percentage of non-popular songs from the 1960's with a major key at `r mean(subset(data1960, target==0)$mode)*100`%.  Similarly, the percentage of popular songs from the 2000's with a major key (`r mean(subset(data2000, target==1)$mode)*100`%) is greater than the percentage of non-popular songs with a major key (`r mean(subset(data2000, target==0)$mode)*100`%).  These trends show a general shift in popular songs towards the major key which is associated with happy or bright melodies compared to non-popular songs.
 
 ```{r Gude_Roughcalcs, include = F}
-mean(as.integer(subset(data1960, target==1)$mode)-1)*100
-mean(as.integer(subset(data1960, target==0)$mode)-1)*100
-mean(as.integer(subset(data2000, target==1)$mode)-1)*100
-mean(as.integer(subset(data2000, target==0)$mode)-1)*100
+mean(subset(data1960, target==1)$mode)*100
+mean(subset(data1960, target==0)$mode)*100
+mean(subset(data2000, target==1)$mode)*100
+mean(subset(data2000, target==0)$mode)*100
 nrow(subset(data1960, mode==1))/nrow(data1960)
 ```
 
@@ -493,14 +496,14 @@ ggplot(data = dataPopular, aes(mode)) +
   theme_minimal()
 ```
 
-The percentage of songs that are in the major key from popular 1960's songs (`r mean(as.integer(subset(data1960, target==1)$mode)-1)*100`%) appears to be significantly higher than the percentage of songs that are in the major key from popular 2000's songs (`r mean(as.integer(subset(data2000, target==1)$mode)-1)*100`%).  Additional T-Testing may confirm if the two values can be considered statistically different or not.
+The percentage of songs that are in the major key from popular 1960's songs (`r mean(subset(data1960, target==1)$mode)*100`%) appears to be significantly higher than the percentage of songs that are in the major key from popular 2000's songs (`r mean(subset(data2000, target==1)$mode)*100`%).  Additional T-Testing may confirm if the two values can be considered statistically different or not.
 
 ### Mode Difference Among Popular Songs Between Decades
-Considering only popular music, the mean mode (equivalent to the percentage of songs with a major key mode) for 1960's music is `r mean(as.integer(subset(data1960, target==1)$mode)-1)`, and the mean key for 2000's music is `r mean(as.integer(subset(data2000, target==1)$mode)-1)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean keys from either decade are statistically equivalent:
+Considering only popular music, the mean mode (equivalent to the percentage of songs with a major key mode) for 1960's music is `r mean(subset(data1960, target==1)$mode)`, and the mean key for 2000's music is `r mean(subset(data2000, target==1)$mode)`.  A Two-Tailed T-Test (H<sub>0</sub>: the two means are statistically equivalent or their true difference in mean value is equal to 0) is performed to determine whether the two mean keys from either decade are statistically equivalent:
 
 ```{r mode_TTest_Gude}
 # Perform t-test
-ttest_mode = t.test((as.integer(subset(data1960, target==1)$mode)-1), (as.integer(subset(data2000, target==1)$mode)-1))
+ttest_mode = t.test((subset(data1960, target==1)$mode), (subset(data2000, target==1)$mode))
 ttest_mode
 ```
 
@@ -510,10 +513,10 @@ From the additional T-Testing below, the mean mode values between popular and no
 
 ```{r mode_TTest_Gude2}
 # Perform tst
-ttest_mode60 = t.test((as.integer(subset(data1960,target ==0)$mode)-1), (as.integer(subset(data1960,target ==1)$mode)-1))
+ttest_mode60 = t.test(subset(data1960,target ==0)$mode, (subset(data1960,target ==1)$mode))
 ttest_mode60
 
-ttest_mode00 = t.test((as.integer(subset(data2000,target ==0)$mode)-1), (as.integer(subset(data2000,target ==1)$mode)-1))
+ttest_mode00 = t.test(subset(data2000,target ==0)$mode, (subset(data2000,target ==1)$mode))
 ttest_mode00
 ```
 
@@ -907,41 +910,45 @@ ttest_liveness00
 
 The conclusion of the exploratory data analysis of song liveness in the two datasets from the 1960's and the 2000's is no collection of popular or non-popular songs were normally-distributed, and the mean values in liveness were distinct (non-equivalent) between popular and non-popular songs in each decade and between popular songs from each decade.
 
+## EDA Conclusions
+
+The results of the exploratory data analysis above demonstrate that all of the features within this dataset except one have differing mean values between both the popular and non-popular songs from each decade as well as between popular songs from the 1960's and 2000's, and no features had a normal distribution.  'Key' is the only musical attribute that does not have a distinct, statistical difference between mean values or distributions between popular and non-popular songs from each decade as well as popular songs from the 1960's or 2000's.  For this reason, it is not likely that 'Key' will be a significant feature in any model, as it is not likely to add any information gain to the models and distinguish between the target variable.
+
+# Model Exploration
+
+The purpose of this study it to identify: Does the key, valence, tempo, or other musical attributes change between popular American songs, and not popular songs for contrast, from the 1960's versus songs from the early 2000's?  In order to answer this question, this study will utilize three predictive models, K-Nearest Neighbor, Decision Tree, and Logistic Regression, to predict the binary "popularity" feature, popular or not popular.  If a model has greater than 50% accuracy in predicting a binary variable, then the model is considered significant (better than random guessing which has an accuracy of 50%).  The musical attribute features utilized within significant models are those that have the most significant impact.  Accordingly, this study will answer the purpose question by identifying whether each predicitive model is significant and comparing and contrasting the significant musical attributes that appear in the models between popular songs in the 1960s and 2000s.
+
 # K-Nearest Neighbor - Juhne
 
-The project goal is to explore which features determine whether a song is popular or not. K-Nearest Neighbor is a good option to apply on this dataset, because both of our 1960s and 2000s datasets have a lot of numerical features and the target we want to predict on is a catagorical variable which is a perfect situation to apply K-Nearest Neighbor algorithm. Since K-Nearest Neighbor algorithm use distance function to measure distance among each data point, make sure that every predictor has same unit is very important. 
+The project goal is to explore which features determine whether a song is popular or not. K-Nearest Neighbor is a good option to apply on this dataset. Since K-Nearest Neighbor algorithms use distance function to measure distance between each data point, verifying that every predictor has same unit is very important. 
 
-From the previous EDA section it showed that **tempo, key and mode** have much greater mean value compare to other predictors. Therefore, in order to make the most accuary K-Nearest Neighbor model, scaling the data using Z-score before building K-Nearest Neighbor model is very necessary.
-
-On the other hand, since the K-Nearest Neighbor algorithm highly depend on distance function. Cleaning the categorical features like **track and artist** is also very important.
+From the previous EDA section it showed that **tempo, key, and mode** have much greater mean values than other predictors; therefore, in order to have the highest accuracy, a K-Nearest Neighbor model scaling the data using Z-score is necessary.  Additionally, since the K-Nearest Neighbor algorithm highly depends on distance function, cleaning the categorical features like **track and artist** is also very important.
  
-From the scaled dataset, notice that **tempo** for 2000s data is smaller than 1960s data in unit factor, the **mode and valence** value range for 2000s data are more spread than 1960 data showing that musice in 2000 have more varieties than music in 1960. However, the 2000s' musics are in general have more **energy** than 1960's musics. 
+From the scaled dataset, notice that **tempo** for 2000 data is smaller than 1960 data in unit factor, the **mode and valence** value range for 2000 data are more spread than 1960 data showing that music in the 2000's have more varieties than music in 1960. However, the 2000's music, in general, has more **energy** than 1960's musics. 
 
 ## K-Nearest Neighbor Scaling
 
 ### scale (data 2000)
 
-Here we apply simple standard scaling technic which is z-score scaling, that scale our numerical variables with their standard deviation so that all of the scaled numerical variables will have their mean equal to zero. This approach is suitable in most of the time when trying to build model that applies distance function like **Euclidean distance** or **Manhattan distance**.
-
 ```{r scale-data-junhe-20}
 # scale tempo ~ liveness
 df.scaled.20 <- as.data.frame(scale(data2000[3:9], center = TRUE, scale = TRUE))
-
+# factor strings
+# df.scaled.20$track <- as.factor(data2000$track)
+# df.scaled.20$artist <- as.factor(data2000$artist)
 df.scaled.20$target <- as.factor(data2000$target)
-
 summary(df.scaled.20)
 ```
 
 ### scale (data 1960)
 
-We apply z-score scaling on our 1960s dataset as well, so that two K-Nearest Neighbor models we build for both datasets in the future have the closest characteristic. Then, we can compare the features that involved in two models and try to discover the most important features that did not change through time as well as the features that have changed through time that represent the change of taste of music of the audience through 1960s to 2000s.
-
 ```{r scale-data-junhe-60}
 # scale tempo ~ liveness
 df.scaled.60 <- as.data.frame(scale(data1960[3:9], center = TRUE, scale = TRUE))
-
+# factor strings
+# df.scaled.20$track <- as.factor(data2000$track)
+# df.scaled.20$artist <- as.factor(data2000$artist)
 df.scaled.60$target <- as.factor(data1960$target)
-
 summary(df.scaled.60)
 ```
 
@@ -949,7 +956,7 @@ summary(df.scaled.60)
 
 ### KNN-correlation matrix of (data 2000)
 
-Before building KNN model, in order to preventing high collinearity between each predictor, it is also necessary to check the correlation between each predictors. From the correlation matrix for 2000s dataset, all predictors are not highly related to each other.
+Before building KNN model, in order to preventing high collinearity between each predictor, it is also necessary to check the correlation between each predictor. From the correlation matrix for 2000s dataset and 1960s dataset below, all predictors are not highly related to each other.  
 
 ```{r KNN-correlation-junhe-20}
 loadPkg('psych')
@@ -960,15 +967,11 @@ pairs.panels(data2000,
              density = TRUE,  # show density plots
              ellipses = TRUE # show correlation ellipses
              )
-
 ```
 
 ### KNN-correlation matrix of (data 1960)
 
-Here we do the same correlation matrix as before for 1960s model and also looks good. It is time to start building our models.
-
 ```{r KNN-correlation-junhe-60}
-
 #pairs(df.scaled.60)
 pairs.panels(data1960, 
              method = "pearson", # correlation method
@@ -983,7 +986,7 @@ pairs.panels(data1960,
 
 ### KNN split data into train test subsets (data 2000)
 
-Since datas are very precious, it is always a good idea to split the original dataset into training and testing subsets. Use training data set to fit KNN model and use testing dataset to test the accuracy of our the model is the best way to utilize the dataset. Set seed to 42 so that the result is reproductable, spliting the original data into 4:1 training and testing subset is a very common ratio to use.
+Since data is very precious, it is always a good idea to split the original dataset into train and test subsets. Use the training data set to fit a KNN model and use the test dataset to test the accuracy of the model is the best way to utilize the dataset. Split the original data into 4:1 train and test subset.
 
 ```{r train-test-junhe-20}
 # split data into train test subset, ratio 4:1, seed 42
@@ -996,14 +999,10 @@ smp_size <- floor(0.80 * nrow(data2000))
 # df.scaled.20 <- as.data.frame(scale(data2000[3:9], center = TRUE, scale = TRUE))
 # df.scaled.20$target <- as.factor(data2000$target)
 summary(df.scaled.20)
-
 dat20_sample <- sample(2, nrow(df.scaled.20), replace=TRUE, prob=c(0.80, 0.20))
-
 ```
 
 ### KNN split data into train test subsets (data 1960)
-
-We do the same spliting process again for our 1960s dataset to keep our entire model building process consistent and comparable. 
 
 ```{r train-test-junhe-60}
 # split data into train test subset, ratio 4:1, seed 42
@@ -1016,16 +1015,14 @@ smp_size <- floor(0.80 * nrow(data1960))
 # df.scaled.20 <- as.data.frame(scale(data2000[3:9], center = TRUE, scale = TRUE))
 # df.scaled.20$target <- as.factor(data2000$target)
 summary(df.scaled.60)
-
 dat60_sample <- sample(2, nrow(df.scaled.60), replace=TRUE, prob=c(0.80, 0.20))
-
 ```
 
 ## K-Nearest Neighbor Seperate target variable
 
 ### KNN seperate target variable y and predictors X (data 2000)
 
-In order to test accuracy of the fitted models, spliting target variable **target** (1 stands for popular, 0 stands for not popular) variable from the predictors is also necessary.
+In order to test accuracy of the fitted models, splitting the target variable **target** (1 stands for "popular", 0 stands for "not popular") variable from the predictors is also necessary.
 
 ```{r y-X-junhe-20}
 train.X.20 <- df.scaled.20[dat20_sample==1, 1:7]
@@ -1039,8 +1036,6 @@ dim(train.X.20)
 
 ### KNN seperate target variable y and predictors X (data 1960)
 
-We do the same target separation step for 1960s dataset for later accuracy testing as same as the previous step we did for 2000s dataset.
-
 ```{r y-X-junhe-60}
 train.X.60 <- df.scaled.60[dat60_sample==1, 1:7]
 train.y.60 <- df.scaled.60[dat60_sample==1, 8]
@@ -1051,11 +1046,11 @@ summary(test.X.60)
 dim(train.X.60)
 ```
 
-## K-Nearest Neighbor helper function to choose best k value
+## K-Nearest Neighbor helper function to choose best K value
 
-This helper function apply K-Nearest Neighbor model function from **class** library, then build confusion matrix using the predicted target value with the test target value. Finally, using the formula **TP/(TP+NP)** to calculate accuracy of the fitted KNN model with given K value. 
+This helper function applies the K-Nearest Neighbor model function from the **class** library, then builds a confusion matrix using the predicted target value with the test target value. Finally, the accuracy is calulated using the formula **TP/(TP+NP)** from the fitted KNN model with a given K value (or number of nearest neighbors from which to evaluate). 
 
-Accuracy is a very important factor to determine the goodness of a fitted KNN model. On the other hand, because of high k-value indicates high precision and high cost on computation, carefully determine the appropriate k-value in order to manage best the trade-off between precision and computation cost is very important. In other word, using the exhaust approach to test a series of k-values and find the most appropriate k-value is the best way to do.
+Accuracy is a very important factor to determine the goodness of a fitted KNN model. On the other hand, because a high K-value indicates high precision and high cost on computation, carefully determining the appropriate K-value in order to manage the best trade-off between precision and computation cost is very important. In other words, this study will use the exhaustive approach to test a series of K-values and find the most appropriate K-value (where the increase in accuracy from a higher K-value reaches a significant diminshment in returns).
 
 ```{r checkK-helper-junhe}
 # load class package for knn
@@ -1083,11 +1078,11 @@ chooseK = function(k, train_set, val_set, train_class, val_class){
 
 ## K-Nearest Neighbor helper function to selection best combination of features with highest accuracy
 
-In order to build the best KNN model with the given datasets to predict whether a music is popular or not. It is necessary to use exhaust approach to build model with all combinations of predictors and decide which combination of predictors can generate the most accurate model.
+In order to build the best KNN model with the given datasets to predict whether a music is popular or not. It is necessary to use an exhaustive approach to build models with all combinations of predictors and decide which combination of predictors will generate the most accurate model.
 
-The **featureSelectionKNN** helper function applies **combn** function which helps generate a list of **n Choose i** feature combinations, where n stands for number of predictors we have in our dataset in our case is **tempo, key, mode, valence, danceability, energy and liveness** total of 7 features, i stands for number of predictors we want to consider in each iteration from i to n in our case is 1 to 7. Within each iteration, apply **chooseK** function to determine the best k-value for this combination of predictors. Then store the model with the highest accuracy into the result dataframe.
+The **featureSelectionKNN** helper function applies the **combn** function which helps generate a list of **n Choose i**, where n stands for number of predictors, i stands for number of predictors we want to consider in each iteration from i to n. Within each iteration, apply **chooseK** function to determine the best k-value for this combination of predictors. Then store the model with the highest accuracy into the result dataframe.
 
-The time complexity for this algorithm is **[(7 Choose 1) times (21-3) times O(knn_function)] +...+ [(7 Choose 7) times (21-3) times O(knn_function)]**. Iterating from **7 Choose 1 to 7 Choose 7**, which is approximately equal to O(n^3), a very time consuming but accurate solution.
+The time complexity for this algorithm is **[(7 Choose 1) times (21-3) times O(knn_function)] +...+ [(7 Choose 7) times (21-3) times O(knn_function)]**. Iterating from **7 Choose 1 to 7 Choose 7**
 
 ```{r featureSelection-junhe}
 #features <- combn(names(train.X.20),3)
@@ -1118,7 +1113,6 @@ featureSelectionKNN <- function(train.X, test.X, train.y, test.y){
   }
   res
 }
-
 ```
 
 ## KNN feature selection (data 2000)
@@ -1126,53 +1120,49 @@ featureSelectionKNN <- function(train.X, test.X, train.y, test.y){
 ```{r feature-selection-junhe-20}
 features.20 = featureSelectionKNN(train.X.20, test.X.20, train.y.20, test.y.20)
 # head(test[order(-test$accuracy),])
-f.20 <- data.frame(features.20[order(-features.20$accuracy),])
+f.20 <- data.frame(features.20[order(-features.20$accuracy),3])
 head(f.20)
 ```
 
-From the above result, the best KNN model for 2000s data after feature selection has accuracy equal to 0.75 with k-value equal 15 and with 5 features which are **tempo, valence, danceability, energy and liveness**.
+From the above result, the best KNN model for 2000s data after feature selection has accuracy equal to 0.75 with k-value equal 15 and 5 features which are **tempo, valence, danceability, energy and liveness**.
 
-The alternative option is the second best KNN model with accuracy equal to 0.75 as same as the best model but with lower k-value which equals 13, and 6 instead of 5 features which are **tempo, mode, valence, danceability, energy and liveness**. However, high k-value can cause expensive computation cost and second best KNN model seems to be better than the best KNN model in the list, we still want to minimize the number of involved predictors to be able to explore the most important factors that decide whether a music is popular or not in 2000s.
+The alternative option is the second best KNN model with accuracy equal to 0.75 as same as the best model but with lower k-value which equals 13, and 6 instead of 5 features which are **tempo, mode, valence, danceability, energy and liveness**. However, high k-value can cause expensive computation cost and second best KNN model seems to be better than the best KNN model in the list, we want to minimize the number of involved predictors to be able to explore the most important factors that decide whether a music is popular or not in 2000s.
 
 ## KNN feature selection (data 1960)
 
 ```{r feature-selection-junhe-60}
 features.60 = featureSelectionKNN(train.X.60, test.X.60, train.y.60, test.y.60)
 # head(test[order(-test$accuracy),])
-f.60 <- data.frame(features.60[order(-features.60$accuracy),])
-head(f.60)
+f.60 <- data.frame(features.60[order(-features.60$accuracy),3])
+f.60
 ```
 
-From the above result, the best KNN model for 1960s data after feature selection has accuracy equal to 0.68 with k-value equal 19 and has only 4 features which are **mode, valence, energy and liveness**.
+From the above result, the best KNN model for 1960s data after feature selection has accuracy equal to 0.68 with k-value equal 19 and only 4 features which are **mode, valence, energy and liveness**.
 
 The alternative option is the second best KNN model with accuracy equal to 0.68 as same as the best model but with higher k-value which equals 21, and 5 instead of 4 features which are **key, mode, valence, danceability, energy**. This time the second best KNN model loses on both k-value and number of predictors. So, we choose the best model without doubt as our final KNN model for 1960s dataset.
 
-In conclusion, comparing the best model for 1960s dataset and 2000s dataset, the important features to determine whether a music is popular has changed from **mode, valence, energy and liveness** in 1960s to **tempo, valence, danceability, energy and liveness** in 2000s. In other word, people in 1960s took **mode, valence, energy and liveness** these four music elements as the most important features to determine whether a music is good or not, and has changed in 2000s to **tempo, valence, danceability, energy and liveness** these five music elements. People still think **valence, energy and liveness** are important factors but no longer took **mode** as an important factor. Moreover, took **tempo and danceability** as two new important factors.
+In conclusion, comparing the best model for 1960s dataset and 2000s dataset, the important features to determine whether a music is popular has changed from **mode, valence, energy and liveness** in 1960s to **tempo, valence, danceability, energy and liveness** in 2000s. In other word, people in 1960s took **mode, valence, energy and liveness** these four music elements as the most important feature to determine whether a music is good or not, and has changed in 2000s to **tempo, valence, danceability, energy and liveness** these five music elements. People still think **valence, energy and liveness** are important factors but no longer took **mode** as an important factor. Moreover, took **tempo and danceability** as two new important factors.
 
 ##Visualize k-values in the best KNN model (data 2000)
 
-After spotting the best features combination and k-values, it is time for us to start building our KNN model using 2000s dataset with the best subset of features and check correctness of our above **featureSelectionKNN** result. Notice that the best k-value among range 1 through 81 is still 15 which is as same as the result we get from **featureSelectionKNN** function. On the other hand, k-value equal 15 is also the ankle value of the k-values series which also demonstrate that this is the best k-value we are looking for.
+Build the KNN model using 2000s dataset with the best subset of features and check correctness our above **featureSelectionKNN** result. Notice that the best k-value among 1 through 81 is still 15 which is as same as the result we get from **featureSelectionKNN** function. On the other hand, k-value equal 15 is also the ankle value of the k-values series which is the best k-value we are looking for.
 
 ```{r KNN-junhe-20}
 # features selected by features selection function, with the best accuracy
 best_features.20 <- c('tempo', 'valence', 'danceability', 'energy', 'liveness')
-
 knn_different_k = sapply(seq(1, 81, by = 2),  #<- set k to be odd number from 1 to 21
                          function(x) chooseK(x, 
                                              train_set = train.X.20[,best_features.20],
                                              val_set = test.X.20[,best_features.20],
                                              train_class = train.y.20,
                                              val_class = test.y.20))
-
 # Reformat the results to graph the results.
 #str(knn_different_k)
 knn_different_k = data.frame(k = knn_different_k[1,],
                              accuracy = knn_different_k[2,])
-
 # Plot accuracy vs. k.
 # install.packages("ggplot2")
 loadPkg('ggplot2')
-
 ggplot(knn_different_k,
        aes(x = k, y = accuracy)) +
   geom_line(color = "orange", size = 1.5) +
@@ -1182,32 +1172,28 @@ ggplot(knn_different_k,
 #as.data.frame(knn_different_k[order(-knn_different_k$accuracy),])[1,2]
 ```
 
-##Visualize k-value trend in the best KNN model (data 1960)
+##Visualize K-value trend in the best KNN model (data 1960)
 
-Same way to build our KNN model using 1960s dataset with the best subset of features and check correctness our above **featureSelectionKNN** result. Notice that the best k-value among 1 through 81 is still 19 which is as same as the result we get from **featureSelectionKNN** function. On the other hand, k-value equal 19 is also the ankle value of the k-values series which also demonstrate that this is the best k-value we are looking for.
+Build the KNN model using 1960s dataset with the best subset of features and check correctness of the above **featureSelectionKNN** result. Notice that the best K-value among 1 through 81 is still 19 which is as same as the result we get from **featureSelectionKNN** function. On the other hand, k-value equal 19 is also the ankle value of the K-values series which is the best K-value we are looking for.
 
 The correctness of all the results has now been proved
 
 ```{r KNN-junhe-60}
 # features selected by features selection function, with the best accuracy
 best_features.60 <- c('mode', 'valence', 'energy', 'liveness')
-
 knn_different_k = sapply(seq(1, 81, by = 2),  #<- set k to be odd number from 1 to 21
                          function(x) chooseK(x, 
                                              train_set = train.X.60[,best_features.60],
                                              val_set = test.X.60[,best_features.60],
                                              train_class = train.y.60,
                                              val_class = test.y.60))
-
 # Reformat the results to graph the results.
 #str(knn_different_k)
 knn_different_k = data.frame(k = knn_different_k[1,],
                              accuracy = knn_different_k[2,])
-
 # Plot accuracy vs. k.
 # install.packages("ggplot2")
 loadPkg('ggplot2')
-
 ggplot(knn_different_k,
        aes(x = k, y = accuracy)) +
   geom_line(color = "orange", size = 1.5) +
@@ -1217,19 +1203,54 @@ ggplot(knn_different_k,
 #as.data.frame(knn_different_k[order(-knn_different_k$accuracy),])[1,2]
 ```
 
+## Conclusion of KNN Testing
 
-# Logit Regression - Siwei
-(For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
 
-(Linear Regression but with non-linear modeling - our target is binary so this is good)
 
-```{r Classification, include=F}
-loadPkg(rpart) # Classification trees, rpart(formula, data=, method=,control=) 
+```{r uzscale_fcn, include=F}
+uzscale <- function(df, append=0, excl=NULL) { 
+  #' Standardize dataframe to z scores, safe for non-numeric variables. 
+  #' ELo 201904 GWU DATS
+  #' @param df The dataframe.
+  #' @param append T/F or 0/1. Option to append scaled columns or replace original columns in the dataframe.
+  #' @param excl A list c(a,b,"d","ef") of excluded columns, either by their indexes and/or names.
+  #' @return The transformed dataframe, appended or replaced with standardized scores. Non-numeric columns will not be appended, or if "replace option" is chosen, the columns will be untouched.
+  #' @examples
+  #' library("ISLR")
+  #' tmp = uzscale( Hitters )
+  #' tmp = uzscale( Hitters, 1 )
+  #' tmp = uzscale( Hitters, TRUE, c(19,"NewLeague") )
+  
+  append = ifelse(append==TRUE || append=="true" || append=="True" || append=="T" || append=="t" || append==1 || append=="1", TRUE, FALSE) # standardize append 
+  nmax = length(df)
+  if (nmax < 1 || !is.numeric(nmax) ) { return(df) }
+  df1 = df
+  onames = colnames(df)  # the original column names
+  cnames = onames  # the new column names, if needed start with the original ones
+  znames = paste("z",cnames, sep="")     # new column names added prefix 'z'. Those are non-numeric will not be used.
+  nadd = ifelse(append, nmax, 0) # add to the column index or replace the orig columns
+  j=1  # counting index
+  for( i in 1:nmax ) {
+    if ( is.numeric(df[,i]) && !( i %in% excl || onames[i] %in% excl ) ) { 
+      df1[,j+nadd] = scale(df[,i])
+      cnames = c(cnames, znames[i])
+      j=j+1
+    } else if ( !append ) { j=j+1
+    } # if append == 1 and (colunm non-numeric or excluded), do not advance j.
+  }
+  if (append) { colnames(df1) <- cnames }
+  return(df1)
+}
+```
+```{r Krystal_packageload, include=F}
+loadPkg(xtable)
+loadPkg(kableExtra)
+loadPkg(stringi)
 ```
 
+# Decision Tree Analysis - Krystal
 
-# Decision Trees
-The main goal of this section is to predict whether the target class of popular and non popular songs will have different variables that affect them in the 1960s and 2000s.  Will the songs have the same variables that matter most in both years or will they differ? 
+The main goal of this section is to predict whether the target class of popular and non-popular songs will have different variables that affect them in the 1960s and 2000s.  Will the songs have the same variables that matter most in both decades or will they differ? 
 
 ## Grow the Tree
 In this section, the study will be using the Categorical Decision Tree to show what makes a song popular in the 1960s verses the 2000s.  The variables of tempo, key, valence, danceability, energy, liveness, and mode are the independent variables and target will be used as the dependent variable.  First there had to be changings made to the variable target so it could be a factor variable.  Once this has been done, one can proceed to grow the decision tree by starting at the root and building up.  Our root will be target which has already been stated as the dependent variable:
@@ -1269,8 +1290,6 @@ text(data2000_DT, use.n=TRUE, all=TRUE, cex=.8)
 post(data1960_DT, file = "data1960.ps", title = "Classification Tree for 1960s Song List")
 post(data2000_DT, file = "data2000.ps", title = "Classification Tree for 2000s Song List")
 ```
-
-
 
 Here are the results. 
 
@@ -1430,30 +1449,258 @@ text(PT_data2000_DT, use.n=TRUE, all=TRUE, cex=.8)
 
 From the pruned trees, the results show different variables for each year on what classified them to get on the Billboards Top 100 List.  For the 1960s songs, the song needed to have an energy level greater than 0.27.  This is shown as the most independent variable that determines the popularity of a song.  In order for a song in the 2000s to make the list, the danceability matter more than energy.  The dancebility had to be greater than a level of 0.40.  In the two eras, there were differences in what was deemed as most important.  In the 1960s, a person needed to have the right energy being eluded from the music while in the 2000s the song had to be a danceable song.
 
+# Logit Regression - Siwei
+
+```{r LogReg-Siwei}
+data1960$track <- factor(data1960$track)
+data1960$artist <- factor(data1960$artist)
+data1960$key <- factor(data1960$key)
+data1960$mode <- factor(data1960$mode)
+data1960$target <- factor(data1960$target)
+```
+
+```{r LogReg-Siwei}
+data1960Logit_1 <- glm(target ~ tempo, data = data1960, family = "binomial")
+data1960Logit_1
+```
+
+We can see the summary of the logit model here:  
+```{r logitSummary-Siwei}
+summary(data1960Logit_1)
+```
+
+
+
+```{r LogReg-Siwei}
+data1960Logit_2 <- glm(target ~ tempo+valence, data = data1960, family = "binomial")
+data1960Logit_2
+summary(data1960Logit_2)
+```
+
+
+```{r LogReg-Siwei}
+data1960Logit_3 <- glm(target ~ tempo+valence+danceability, data = data1960, family = "binomial")
+data1960Logit_3
+summary(data1960Logit_3)
+```
+
+
+```{r LogReg-Siwei}
+data1960Logit_4 <- glm(target ~ tempo+valence+danceability+energy, data = data1960, family = "binomial")
+data1960Logit_4
+summary(data1960Logit_4)
+```
+
+```The best model for year 1960 is data1960Logit_4. All the coefficients are found significant because of the small p-values. Tempo, valence, danceability and energy all have positive effects on music popularity. Energy had the biggest positive coefficient on music in 1960, while tempo had the smallest influence on popularity.```
+```{r}
+x = exp(coef(data1960Logit_4)) 
+x
+```
+
+
+```{r siwei-logit_fitted_value}
+data1960Logit$fitted.values[1]
+predict(data1960Logit)[1]
+1/(1+exp(-predict(data1960Logit)[1]))
+```
+
+### Model evaluation
+#### Confusion matrix 
+
+This is just one of the many libraries you can find the confusion matrix. It is easy to use, but not very powerful, lacking ability to choose cutoff value, and it does not give you all the metrics like accuracy, precision, recall, sensitivity, f1 score etc. Nonetheless, it's handy.
+
+```{r confusionMatrix}
+loadPkg(regclass)
+confusion_matrix(admitLogit)
+unloadPkg(regclass)
+```
+
+
+```{r LogReg-Siwei}
+data1960Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data = data1960, family = "binomial")
+data1960Logit_5
+summary(data1960Logit_5)
+```
+
+
+#### Hosmer and Lemeshow test  
+
+The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit.
+
+```{r HosmerLemeshow-Siwei}
+loadPkg(ResourceSelection) # function hoslem.test( ) for logit model evaluation
+data1960Logit_4Hoslem = hoslem.test(data1960$target, fitted(data1960Logit_1)) # Hosmer and Lemeshow test, a chi-squared test
+unloadPkg(ResourceSelection) 
+```
+
+The result is shown here:  
+```{r HosmerLemeshowRes-Siwei, results='markup', collapse=F}
+data1960Logit_4Hoslem
+```
+
+The p-value of `r data1960Logit_4Hoslem$p.value` is small. This indicates the model is a good fit, at the same time all the coefficients are significant. 
+
+
+
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+
+ROC and AUC measures the true positive rate (or sensitivity) against the false positive rate (or specificity). The area-under-curve is always between 0.5 and 1. Values higher than 0.8 is considered good model fit.  
+```{r roc_auc}
+loadPkg(pROC) 
+prob=predict(data1960Logit, type = c("response"))
+data1960Logit$prob=prob
+h <- roc(target~prob, data=data1960)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg(pROC) 
+```
+
+
+We have here the area-under-curve of `r auc(h)`, which is less than 0.8. This test also agrees the model is not considered tht good fit,but it's okay for the fitting. 
+
+#### McFadden  
+
+McFadden is another evaluation tool we can use on logit regressions. This is part of what is called pseudo-R-squared values for evaluation tests. 
+
+```{r McFadden_direct}
+data1960NullLogit <- glm(target ~ 1, data = data1960, family = "binomial")
+mcFadden = 1 - logLik(data1960Logit)/logLik(data1960NullLogit)
+mcFadden
+```
+
+Or we can use other libraries. The `pscl` (Polictical Science Computational Lab) library has the function `pR2()` (pseudo-R$^2$) will do the trick.  
+
+```{r McFadden}
+loadPkg(pscl) # use pR2( ) function to calculate McFadden statistics for model eval
+data1960Logitpr2 = pR2(data1960Logit)
+data1960Logitpr2
+unloadPkg(pscl) 
+```
+
+With the McFadden value of the model, which is analgous to the coefficient of determination $R^2$, only about 8% of the variations in y is explained by the explanatory variables in the model. 
+
+A major weakness of the overall model is likely from the small dataset sample size of `r length(Admit$admit)`. We expect a much higher number of observations will increase the sensitivity of the model.
+
+
+
+
+
+```{r LogReg-Siwei}
+data2000$track <- factor(data2000$track)
+data2000$artist <- factor(data2000$artist)
+data2000$key <- factor(data2000$key)
+data2000$mode <- factor(data2000$mode)
+data2000$target <- factor(data2000$target)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_1 <- glm(target ~ tempo, data = data2000, family = "binomial")
+summary(data2000Logit_1)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_2 <- glm(target ~ tempo+valence, data = data2000, family = "binomial")
+summary(data2000Logit_2)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_3 <- glm(target ~ tempo+valence+danceability, data = data2000, family = "binomial")
+summary(data2000Logit_3)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_4 <- glm(target ~ tempo+valence+danceability+energy, data = data2000, family = "binomial")
+summary(data2000Logit_4)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data = data2000, family = "binomial")
+summary(data2000Logit_5)
+```
+
+```The best model for year 2000 is data2000Logit_5. From the p value, only danceability, energy and liveness coefficients are found significant. Tempo, danceability and energy have positive effects on popularity. On the contract, valence and liveness have negative effects. ```
+```{r}
+x = exp(coef(data2000Logit_5)) 
+x
+```
+
+
+#### Hosmer and Lemeshow test  
+
+The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit.
+
+```{r HosmerLemeshow}
+loadPkg(ResourceSelection) # function hoslem.test( ) for logit model evaluation
+data2000Logit_5Hoslem = hoslem.test(data2000$target, fitted(data2000Logit_5)) # Hosmer and Lemeshow test, a chi-squared test
+unloadPkg(ResourceSelection)
+```
+
+The result is shown here:  
+```{r HosmerLemeshowRes, results='markup', collapse=F}
+data2000Logit_5Hoslem
+```
+
+
+``` The p-value of `r data2000Logit_5Hoslem$p.value` is quite samll. This indicates the model is a good fit, despite only three coefficients are found significant. ```
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+ROC and AUC measures the true positive rate (or sensitivity) against the false positive rate (or specificity). The area-under-curve is always between 0.5 and 1. Values higher than 0.8 is considered good model fit.  
+```{r roc_auc}
+loadPkg(pROC) 
+prob=predict(data2000Logit_5, type = c("response"))
+data2000$prob=prob
+h <- roc(target~prob, data=data2000)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg(pROC) 
+```
+
+
+We have here the area-under-curve of `r auc(h)`, which is almost 0.8. This test shows that the model is a good fit. 
+
+#### McFadden  
+
+McFadden is another evaluation tool we can use on logit regressions. This is part of what is called pseudo-R-squared values for evaluation tests. We can calculate the value directly from its definition if we so choose to.
+
+```{r McFadden_direct}
+data2000NullLogit <- glm(target ~ 1, data = data2000, family = "binomial")
+mcFadden = 1 - logLik(data2000Logit_5)/logLik(data2000NullLogit)
+mcFadden
+```
+
+Or we can use other libraries. The `pscl` (Polictical Science Computational Lab) library has the function `pR2()` (pseudo-R$^2$) will do the trick.  
+
+```{r McFadden}
+loadPkg(pscl) # use pR2( ) function to calculate McFadden statistics for model eval
+data2000Logitpr2 = pR2(data2000Logit_5)
+data2000Logitpr2
+unloadPkg(pscl) 
+```
+
+
+A major weakness of the overall model is likely from the small dataset sample size. We expect a much higher number of observations will increase the sensitivity of the model.
+
+
+### Model evaluation
+#### Confusion matrix 
+
+This is just one of the many libraries you can find the confusion matrix. It is easy to use, but not very powerful, lacking ability to choose cutoff value, and it does not give you all the metrics like accuracy, precision, recall, sensitivity, f1 score etc. Nonetheless, it's handy.
+
+```{r confusionMatrix}
+loadPkg(regclass)
+confusion_matrix(admitLogit)
+unloadPkg(regclass)
+```
+
+
 # Summary of Results
 
-The purpose of this study is to analyse the affect of music attributes, such as tempo, key, mode, etc, on the popularity of songs with respect to time via the Spotify 
-
-The purpose of this study was to analyze the effect of genetic, wealth, and fitness factors, specifically correlating with ethnicity, gender, age, household income, and veteran status of interviewed adult (ages 18 and older) from the NHANES from 2005 and 2006, on human blood pressure in order to inform follow-on research and development efforts.  From the tests and results conducted and reported herein this study, it has been shown that there is a clear, statistically significant affect on blood pressure from all five factors (ethnicity, gender, age, household income, and veteran status).  Additional testing and study may be warranted to flesh out the exact mechanisms by which each of these factors may or may not affect blood pressure (since correlation does not imply causation).  Additionally from the results, the effect from ethnicity and gender on systolic pressure had the most significant effects on average blood pressures compared to the rest of the factors, and more research may be directed in understanding the correlation.
 
 
 ---
 [^1] Taken from [Spotify for Developers Web Services Page](https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/)
 [^2] From Molanphy, Chris (August 1, 2013). "How The Hot 100 Became America's Hit Barometer". Published by NPR.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
