@@ -508,6 +508,255 @@ ggplot(knn_different_k,
 # Logit Regression - Siwei
 (For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (e.g., logit - our point is to impress with the data discussion and fill out a 10-page report))
 
+# Logit Regression - Siwei
+(For each test, write down the following: What the test says/Why are we performing, the assumptions of test, the math behind (why I trust the results), and discussion of conclusion - **NAMELY HOW THE VALUES OR FEATURES OR PROBABILITIES CHANGE BETWEEN THE TWO DATASETS as that is our purpose for this study**. Another good method is for each of the tests below, conduct all of the indiviudal tests that were performed in each weekly Rstudio document for said test (eg. logit - our point is to impress with the data discussion and fill out a 10-page report)
+
+```{r LogReg-Siwei}
+data1960$track <- factor(data1960$track)
+data1960$artist <- factor(data1960$artist)
+data1960$key <- factor(data1960$key)
+data1960$mode <- factor(data1960$mode)
+data1960$target <- factor(data1960$target)
+```
+
+```{r LogReg-Siwei}
+data1960Logit_1 <- glm(target ~ tempo, data = data1960, family = "binomial")
+data1960Logit_1
+```
+
+We can see the summary of the logit model here:  
+```{r logitSummary-Siwei}
+summary(data1960Logit_1)
+```
+
+
+
+```{r LogReg-Siwei}
+data1960Logit_2 <- glm(target ~ tempo+valence, data = data1960, family = "binomial")
+data1960Logit_2
+summary(data1960Logit_2)
+```
+
+
+```{r LogReg-Siwei}
+data1960Logit_3 <- glm(target ~ tempo+valence+danceability, data = data1960, family = "binomial")
+data1960Logit_3
+summary(data1960Logit_3)
+```
+
+
+```{r LogReg-Siwei}
+data1960Logit_4 <- glm(target ~ tempo+valence+danceability+energy, data = data1960, family = "binomial")
+data1960Logit_4
+summary(data1960Logit_4)
+```
+
+```The best model for year 1960 is data1960Logit_4. All the coefficients are found significant because of the small p-values. Tempo, valence, danceability and energy all have positive effects on music popularity. Energy had the biggest positive coefficient on music in 1960, while tempo had the smallest influence on popularity.```
+```{r}
+x = exp(coef(data1960Logit_4)) 
+x
+```
+
+
+```{r siwei-logit_fitted_value}
+data1960Logit$fitted.values[1]
+predict(data1960Logit)[1]
+1/(1+exp(-predict(data1960Logit)[1]))
+```
+
+### Model evaluation
+#### Confusion matrix 
+
+This is just one of the many libraries you can find the confusion matrix. It is easy to use, but not very powerful, lacking ability to choose cutoff value, and it does not give you all the metrics like accuracy, precision, recall, sensitivity, f1 score etc. Nonetheless, it's handy.
+
+```{r confusionMatrix}
+loadPkg(regclass)
+confusion_matrix(admitLogit)
+unloadPkg(regclass)
+```
+
+
+```{r LogReg-Siwei}
+data1960Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data = data1960, family = "binomial")
+data1960Logit_5
+summary(data1960Logit_5)
+```
+
+
+#### Hosmer and Lemeshow test  
+
+The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit.
+
+```{r HosmerLemeshow-Siwei}
+loadPkg(ResourceSelection) # function hoslem.test( ) for logit model evaluation
+data1960Logit_4Hoslem = hoslem.test(data1960$target, fitted(data1960Logit_1)) # Hosmer and Lemeshow test, a chi-squared test
+unloadPkg(ResourceSelection) 
+```
+
+The result is shown here:  
+```{r HosmerLemeshowRes-Siwei, results='markup', collapse=F}
+data1960Logit_4Hoslem
+```
+
+The p-value of `r data1960Logit_4Hoslem$p.value` is small. This indicates the model is a good fit, at the same time all the coefficients are significant. 
+
+
+
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+
+ROC and AUC measures the true positive rate (or sensitivity) against the false positive rate (or specificity). The area-under-curve is always between 0.5 and 1. Values higher than 0.8 is considered good model fit.  
+```{r roc_auc}
+loadPkg(pROC) 
+prob=predict(data1960Logit, type = c("response"))
+data1960Logit$prob=prob
+h <- roc(target~prob, data=data1960)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg(pROC) 
+```
+
+
+We have here the area-under-curve of `r auc(h)`, which is less than 0.8. This test also agrees the model is not considered tht good fit,but it's okay for the fitting. 
+
+#### McFadden  
+
+McFadden is another evaluation tool we can use on logit regressions. This is part of what is called pseudo-R-squared values for evaluation tests. 
+
+```{r McFadden_direct}
+data1960NullLogit <- glm(target ~ 1, data = data1960, family = "binomial")
+mcFadden = 1 - logLik(data1960Logit)/logLik(data1960NullLogit)
+mcFadden
+```
+
+Or we can use other libraries. The `pscl` (Polictical Science Computational Lab) library has the function `pR2()` (pseudo-R$^2$) will do the trick.  
+
+```{r McFadden}
+loadPkg(pscl) # use pR2( ) function to calculate McFadden statistics for model eval
+data1960Logitpr2 = pR2(data1960Logit)
+data1960Logitpr2
+unloadPkg(pscl) 
+```
+
+With the McFadden value of the model, which is analgous to the coefficient of determination $R^2$, only about 8% of the variations in y is explained by the explanatory variables in the model. 
+
+A major weakness of the overall model is likely from the small dataset sample size of `r length(Admit$admit)`. We expect a much higher number of observations will increase the sensitivity of the model.
+
+
+
+
+
+```{r LogReg-Siwei}
+data2000$track <- factor(data2000$track)
+data2000$artist <- factor(data2000$artist)
+data2000$key <- factor(data2000$key)
+data2000$mode <- factor(data2000$mode)
+data2000$target <- factor(data2000$target)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_1 <- glm(target ~ tempo, data = data2000, family = "binomial")
+summary(data2000Logit_1)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_2 <- glm(target ~ tempo+valence, data = data2000, family = "binomial")
+summary(data2000Logit_2)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_3 <- glm(target ~ tempo+valence+danceability, data = data2000, family = "binomial")
+summary(data2000Logit_3)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_4 <- glm(target ~ tempo+valence+danceability+energy, data = data2000, family = "binomial")
+summary(data2000Logit_4)
+```
+
+
+```{r LogReg-Siwei}
+data2000Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data = data2000, family = "binomial")
+summary(data2000Logit_5)
+```
+
+```The best model for year 2000 is data2000Logit_5. From the p value, only danceability, energy and liveness coefficients are found significant. Tempo, danceability and energy have positive effects on popularity. On the contract, valence and liveness have negative effects. ```
+```{r}
+x = exp(coef(data2000Logit_5)) 
+x
+```
+
+
+#### Hosmer and Lemeshow test  
+
+The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit.
+
+```{r HosmerLemeshow}
+loadPkg(ResourceSelection) # function hoslem.test( ) for logit model evaluation
+data2000Logit_5Hoslem = hoslem.test(data2000$target, fitted(data2000Logit_5)) # Hosmer and Lemeshow test, a chi-squared test
+unloadPkg(ResourceSelection)
+```
+
+The result is shown here:  
+```{r HosmerLemeshowRes, results='markup', collapse=F}
+data2000Logit_5Hoslem
+```
+
+
+``` The p-value of `r data2000Logit_5Hoslem$p.value` is quite samll. This indicates the model is a good fit, despite only three coefficients are found significant. ```
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+ROC and AUC measures the true positive rate (or sensitivity) against the false positive rate (or specificity). The area-under-curve is always between 0.5 and 1. Values higher than 0.8 is considered good model fit.  
+```{r roc_auc}
+loadPkg(pROC) 
+prob=predict(data2000Logit_5, type = c("response"))
+data2000$prob=prob
+h <- roc(target~prob, data=data2000)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg(pROC) 
+```
+
+
+We have here the area-under-curve of `r auc(h)`, which is almost 0.8. This test shows that the model is a good fit. 
+
+#### McFadden  
+
+McFadden is another evaluation tool we can use on logit regressions. This is part of what is called pseudo-R-squared values for evaluation tests. We can calculate the value directly from its definition if we so choose to.
+
+```{r McFadden_direct}
+data2000NullLogit <- glm(target ~ 1, data = data2000, family = "binomial")
+mcFadden = 1 - logLik(data2000Logit_5)/logLik(data2000NullLogit)
+mcFadden
+```
+
+Or we can use other libraries. The `pscl` (Polictical Science Computational Lab) library has the function `pR2()` (pseudo-R$^2$) will do the trick.  
+
+```{r McFadden}
+loadPkg(pscl) # use pR2( ) function to calculate McFadden statistics for model eval
+data2000Logitpr2 = pR2(data2000Logit_5)
+data2000Logitpr2
+unloadPkg(pscl) 
+```
+
+
+A major weakness of the overall model is likely from the small dataset sample size. We expect a much higher number of observations will increase the sensitivity of the model.
+
+
+### Model evaluation
+#### Confusion matrix 
+
+This is just one of the many libraries you can find the confusion matrix. It is easy to use, but not very powerful, lacking ability to choose cutoff value, and it does not give you all the metrics like accuracy, precision, recall, sensitivity, f1 score etc. Nonetheless, it's handy.
+
+```{r confusionMatrix}
+loadPkg(regclass)
+confusion_matrix(admitLogit)
+unloadPkg(regclass)
+```
+
+
 (Linear Regression but with non-linear modeling - our target is binary so this is good)
 
 # Feature Selection/Model selection - Krystal
