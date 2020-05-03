@@ -1473,6 +1473,10 @@ From the pruned trees, the results show different variables for each year on wha
 
 # Logit Regression - Siwei
 
+Logistic regression is a type of generalized linear model that uses statistical analysis to predict an event based on known factors. I use logistic regression here to make predictions about whether a song will be popular in different years based on features we used before like danceability, tempo, valence and energy.
+
+I change some variables into categorical first to make better analysis later on.
+
 ```{r LogReg-Siwei}
 data1960$track <- factor(data1960$track)
 data1960$artist <- factor(data1960$artist)
@@ -1529,7 +1533,10 @@ predict(data1960Logit)[1]
 ### Model evaluation
 #### Confusion matrix 
 
-This is just one of the many libraries you can find the confusion matrix. It is easy to use, but not very powerful, lacking ability to choose cutoff value, and it does not give you all the metrics like accuracy, precision, recall, sensitivity, f1 score etc. Nonetheless, it's handy.
+Confusion matrix is a table that is often used to describe the performance of a classifier on a set of test data for which the true values are known. It allows the visualization of the performance of an algorithm. 
+
+This is just one of the many libraries you can find the confusion matrix. It is easy to use, but not very powerful, lacking ability to choose cutoff value, and it does not give you all the metrics like accuracy, precision, recall, sensitivity, f1 score etc. 
+
 
 ```{r confusionMatrix}
 loadPkg(regclass)
@@ -1560,8 +1567,13 @@ The result is shown here:
 data1960Logit_4Hoslem
 ```
 
-The p-value of `r data1960Logit_4Hoslem$p.value` is small. This indicates the model is a good fit, at the same time all the coefficients are significant. 
+H0: no significant difference between the model and the observed data
 
+p-value < 0.05, we can reject the null, which indicates the model is a good fit, at the same time all the coefficients are significant.
+
+Similar to comparing the actual frequency distribution to the model predicted frequency distribution. 
+ 
+Of course this is just a very simple simulation study, but it is nice to see that, at least for the setup we have used, the test performs as we would hope.
 
 
 #### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
