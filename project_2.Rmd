@@ -243,6 +243,8 @@ summary(data1960Logit_4)
 ```The best model for year 1960 is data1960Logit_4. All the coefficients are found significant because of the small p-values. Tempo, valence, danceability and energy all have positive effects on music popularity. Energy had the biggest positive coefficient on music in 1960, while tempo had the smallest influence on popularity.```
 
 
+```All the coefficients are found significant because of the small p-value. Tempo, valence, danceability and energy all have positive effects on music popularity because their log-mean probability coefficients are greater than 1. Energy had the biggest positive coefficient on music in 1960, while tempo had the smallest influence.```
+
 ```{r}
 x = exp(coef(data1960Logit_4)) 
 x
@@ -266,6 +268,7 @@ confusion_matrix(admitLogit)
 unloadPkg(regclass)
 ```
 
+```64% Accuracy from Confusion Matrix```
 
 ```{r LogReg-Siwei}
 data1960Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data = data1960, family = "binomial")
@@ -336,7 +339,6 @@ A major weakness of the overall model is likely from the small dataset sample si
 
 
 
-
 ```{r LogReg-Siwei}
 data2000$track <- factor(data2000$track)
 data2000$artist <- factor(data2000$artist)
@@ -377,8 +379,7 @@ data2000Logit_5 <- glm(target ~ tempo+valence+danceability+energy+liveness, data
 summary(data2000Logit_5)
 ```
 
-```The best model for year 2000 is data2000Logit_5. From the p value, only danceability, energy and liveness coefficients are found significant. Tempo, danceability and energy have positive effects on popularity. On the contract, valence and liveness have negative effects. ```
-
+```The best model for year 2000 is data2000Logit_5. For danceability and energy, because the coefficients are greater than 1, as they increase, the probability of popularity is increasing.  The opposite is true for liveness - the greater the liveness value, the less likely the song is popular.```
 
 ```{r}
 x = exp(coef(data2000Logit_5)) 
@@ -421,7 +422,7 @@ plot(h)
 ```
 
 
-We have here the area-under-curve of `r auc(h)`, which is almost 0.8. This test shows that the model is a good fit. 
+```We have here the area-under-curve of `r auc(h)`, which is almost 0.8. This test shows that the model is a good fit.``` 
 
 #### McFadden  
 
@@ -457,7 +458,9 @@ confusion_matrix(admitLogit)
 unloadPkg(regclass)
 ```
 
+```69.1% Accuracy from the confusion matrix.```
 
+```In conclusion, in 1960 if a song is popular, it needs to have the features like energy, danceability, valence and tempo. In 2000, if a song is popular, it needs to have the the features like danceability, energy and liveness.```
 
 (Linear Regression but with non-linear modeling - our target is binary so this is good)
 
